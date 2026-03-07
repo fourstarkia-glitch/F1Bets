@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="F1 Bets"/>
+<title>F1 2026 Bet Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#060606;color:#fff;font-family:'Barlow Condensed',system-ui,sans-serif;min-height:100vh;-webkit-tap-highlight-color:transparent}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#111}::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
+select option{background:#1c1c1c}
+.app{max-width:700px;margin:0 auto;padding-bottom:90px}
+.header{background:linear-gradient(180deg,#0f0f0f 0%,#060606 100%);border-bottom:1px solid #1a1a1a;padding:18px 20px 14px}
+.header-top{display:flex;justify-content:space-between;align-items:flex-start}
+.f1-badge{background:#E8002D;color:#fff;font-size:11px;font-weight:800;letter-spacing:3px;padding:3px 8px;border-radius:3px}
+.season-label{font-size:13px;letter-spacing:3px;color:#666}
+h1{font-size:30px;font-weight:800;letter-spacing:2px;line-height:1}
+.bet-count{text-align:right;font-size:12px;color:#555}
+.header-btns{display:flex;gap:4px;margin-top:6px;justify-content:flex-end;flex-wrap:wrap}
+.hbtn{background:none;border:1px solid #2a2a2a;border-radius:5px;color:#666;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.sync-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:middle}
+.sync-dot.on{background:#4caf50}.sync-dot.off{background:#555}.sync-dot.spin{background:#f5c518;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.scoreboard{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;margin-top:16px;background:#0d0d0d;border-radius:10px;padding:14px 16px;border:1px solid #1a1a1a}
+.score-col{display:flex;flex-direction:column}
+.score-col.right{align-items:flex-end;text-align:right}
+.player-name-btn{background:none;border:none;cursor:pointer;padding:0;font-family:inherit;font-size:13px;letter-spacing:2px;text-transform:uppercase;font-weight:600}
+.player-name-btn.p1{color:#E8002D}.player-name-btn.p2{color:#0090FF}
+.name-edit{display:flex;gap:6px;align-items:center}
+.name-input{background:#1a1a1a;border-radius:4px;color:#fff;padding:4px 8px;font-size:16px;font-family:inherit;width:110px;border:1px solid #333}
+.name-input.p1{border-color:#E8002D}.name-input.p2{border-color:#0090FF;text-align:right}
+.confirm-btn{border:none;border-radius:4px;color:#fff;padding:4px 8px;cursor:pointer;font-size:12px}
+.confirm-btn.p1{background:#E8002D}.confirm-btn.p2{background:#0090FF}
+.score-pts{font-size:48px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+.score-pts.dim{color:#888}.score-pts.bright{color:#fff}
+.score-label{font-size:11px;color:#555;letter-spacing:1px}
+.leading-badge{font-size:10px;letter-spacing:2px;margin-top:2px}
+.leading-badge.p1{color:#E8002D}.leading-badge.p2{color:#0090FF}
+.vs-col{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.vs-line{width:1px;height:30px;background:#222}.vs-text{font-size:11px;color:#333;letter-spacing:2px}
+.pts-bar-wrap{margin-top:10px;height:4px;border-radius:2px;background:#1a1a1a;overflow:hidden}
+.pts-bar{height:100%;background:linear-gradient(90deg,#E8002D,#ff4444);border-radius:2px;transition:width .5s ease}
+.countdown{display:flex;gap:6px;margin-top:12px}
+.cd-block{flex:1;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:8px;padding:8px 4px;text-align:center}
+.cd-num{font-size:26px;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums}
+.cd-lbl{font-size:9px;letter-spacing:2px;color:#555;margin-top:3px;text-transform:uppercase}
+.cd-race-name{font-size:11px;color:#E8002D;letter-spacing:1.5px;text-align:center;margin-top:8px;text-transform:uppercase}
+.tabs{display:flex;gap:6px;padding:12px 20px;overflow-x:auto;border-bottom:1px solid #111;-webkit-overflow-scrolling:touch}
+.tab{border-radius:6px;padding:6px 14px;font-size:12px;letter-spacing:1.5px;cursor:pointer;font-family:inherit;text-transform:uppercase;white-space:nowrap;border:1px solid #2a2a2a}
+.tab.active{background:#E8002D;border-color:#E8002D;color:#fff;font-weight:700}
+.tab.inactive{background:transparent;color:#888}
+.race-filter{padding:10px 20px;border-bottom:1px solid #111}
+.race-filter select{background:#111;border:1px solid #2a2a2a;border-radius:6px;color:#ccc;padding:7px 12px;font-size:13px;font-family:inherit;width:100%}
+.bet-list{padding:16px 20px}
+.empty{text-align:center;padding:48px 20px;color:#444}
+.bet-card{background:#111;border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.bet-card-inner{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.bet-meta{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+.bet-cat-label{font-size:13px;color:#aaa;letter-spacing:1px;text-transform:uppercase}
+.bet-race-tag{font-size:11px;background:#1e1e1e;color:#666;border-radius:4px;padding:2px 6px}
+.risky-tag{font-size:10px;background:#2a1500;color:#ff6600;border-radius:4px;padding:2px 6px;letter-spacing:1px;font-weight:700}
+.ppp-tag{font-size:10px;background:#0a1a2a;color:#0090FF;border-radius:4px;padding:2px 6px}
+.picks-inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pick{border-radius:6px;padding:4px 10px;font-size:13px;display:flex;align-items:center;gap:4px}
+.pick .who{font-size:10px;opacity:.6}
+.pick.neutral{background:#1a1a1a;border:1px solid #2a2a2a;color:#ccc}
+.pick.win-red{background:#E8002D22;border:1px solid #E8002D;color:#E8002D;font-weight:700}
+.pick.win-blue{background:#0090FF22;border:1px solid #0090FF;color:#0090FF;font-weight:700}
+.vs-small{color:#444;font-size:12px}
+.multi-player-block{margin-bottom:7px}
+.multi-player-lbl{font-size:10px;letter-spacing:1.5px;margin-bottom:4px;font-weight:700}
+.pill-row{display:flex;gap:3px;flex-wrap:wrap}
+.pill{border-radius:5px;padding:3px 8px;font-size:12px}
+.pill.neutral{background:#1a1a1a;border:1px solid #2a2a2a;color:#ccc}
+.pill.correct{background:#0d2a0d;border:1px solid #2d6a2d;color:#4caf50;font-weight:700}
+.pill.wrong{background:#1a1a1a;border:1px solid #222;color:#444;text-decoration:line-through}
+.pill.actual{background:#1a1400;border:1px solid #3a3000;color:#998800}
+.actual-strip{margin-top:8px;padding:7px 10px;background:#0d0d0d;border-radius:6px;border:1px solid #1a1a1a}
+.actual-strip-lbl{font-size:10px;color:#555;letter-spacing:1.5px;margin-bottom:5px;text-transform:uppercase}
+.multi-score-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.msc{font-size:12px;font-weight:700;padding:3px 10px;border-radius:5px}
+.msc.red{background:#E8002D18;border:1px solid #E8002D44;color:#E8002D}
+.msc.blue{background:#0090FF18;border:1px solid #0090FF44;color:#0090FF}
+.bet-right{text-align:right;flex-shrink:0}
+.bet-pts{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.multi-pts-col{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.mpt{font-size:15px;font-weight:700}
+.bet-actions{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.settle-btn{border:none;border-radius:5px;color:#fff;padding:5px 10px;font-size:11px;letter-spacing:1px;cursor:pointer;font-family:inherit;text-transform:uppercase}
+.edit-btn{background:none;border:1px solid #2a2a2a;border-radius:5px;color:#666;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit}
+.delete-btn{background:none;border:1px solid #2a2a2a;border-radius:5px;color:#555;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit}
+.bet-note{margin-top:8px;padding:7px 10px;background:#0d0d0d;border-left:2px solid #333;border-radius:0 5px 5px 0;font-size:12px;color:#666;font-style:italic}
+.fab{position:fixed;bottom:28px;right:20px;background:#E8002D;border:none;border-radius:50%;color:#fff;width:58px;height:58px;font-size:28px;cursor:pointer;box-shadow:0 4px 20px rgba(232,0,45,.5);display:flex;align-items:center;justify-content:center;z-index:500}
+.stats-page{padding:16px 20px}
+.stats-section{margin-bottom:24px}
+.stats-title{font-size:11px;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:10px}
+.stat-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat-card{background:#111;border:1px solid #1a1a1a;border-radius:10px;padding:14px}
+.stat-val{font-size:32px;font-weight:800;line-height:1}
+.stat-val.red{color:#E8002D}.stat-val.blue{color:#0090FF}.stat-val.gold{color:#f5c518}
+.stat-lbl{font-size:11px;color:#555;letter-spacing:1px;margin-top:3px}
+.h2h-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #141414}
+.h2h-cat{font-size:13px;color:#aaa}
+.h2h-scores{display:flex;gap:10px;align-items:center}
+.h2h-score{font-size:16px;font-weight:700;min-width:20px;text-align:center}
+.h2h-score.red{color:#E8002D}.h2h-score.blue{color:#0090FF}.h2h-score.dim{color:#444}
+.streak-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#111;border:1px solid #2a2a2a;border-radius:12px;padding:24px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-title{font-size:18px;font-weight:700;letter-spacing:2px;color:#fff}
+.close-btn{background:none;border:none;color:#666;font-size:22px;cursor:pointer;padding:4px 8px}
+.field-lbl{display:block;font-size:11px;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:5px;margin-top:14px}
+.field-input{background:#1c1c1c;border:1px solid #333;border-radius:6px;color:#fff;padding:9px 12px;width:100%;font-size:14px;font-family:inherit}
+.picks-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pts-input{background:#1c1c1c;border:1px solid #333;border-radius:6px;color:#fff;padding:9px 12px;width:100px;font-size:14px;font-family:inherit}
+.lock-btn{margin-top:20px;width:100%;border:none;border-radius:8px;padding:13px 0;font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;font-family:inherit;cursor:pointer}
+.settle-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.settle-opt{border-radius:8px;padding:14px 8px;cursor:pointer;font-size:14px;font-weight:700;text-align:center;font-family:inherit;border-width:2px;border-style:solid}
+.settle-opt.red{background:#E8002D11;border-color:#E8002D;color:#E8002D}
+.settle-opt.blue{background:#0090FF11;border-color:#0090FF;color:#0090FF}
+.void-btn{width:100%;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#888;padding:10px 0;cursor:pointer;font-size:13px;letter-spacing:1px;text-transform:uppercase;font-family:inherit;margin-top:8px}
+.score-preview{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:8px;padding:12px 16px;margin-top:14px}
+.score-preview-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0}
+.score-preview-row+.score-preview-row{border-top:1px solid #1a1a1a}
+.multi-pick-section{margin-top:14px}
+.multi-pick-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.mpc{font-size:12px;font-weight:700;padding:2px 8px;border-radius:4px}
+.driver-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;max-height:230px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.driver-btn{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:6px;color:#888;padding:9px 10px;font-size:13px;cursor:pointer;font-family:inherit;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.driver-btn.sel-red{background:#E8002D22;border-color:#E8002D;color:#E8002D;font-weight:700}
+.driver-btn.sel-blue{background:#0090FF22;border-color:#0090FF;color:#0090FF;font-weight:700}
+.driver-btn.sel-gold{background:#f5c51822;border-color:#f5c518;color:#f5c518;font-weight:700}
+.driver-btn.maxed{opacity:.35;cursor:not-allowed}
+.export-box{background:#0a0a0a;border:1px solid #222;border-radius:8px;padding:16px;font-size:12px;color:#aaa;white-space:pre-wrap;line-height:1.7;max-height:260px;overflow-y:auto;margin-bottom:14px;font-family:monospace}
+.action-btn{width:100%;border-radius:8px;padding:11px 0;cursor:pointer;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;font-family:inherit;margin-bottom:8px}
+.sync-opt{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:18px;cursor:pointer;text-align:center;margin-bottom:10px}
+.sync-opt-icon{font-size:28px;margin-bottom:8px}
+.sync-opt-title{font-size:16px;font-weight:700;margin-bottom:4px}
+.sync-opt-desc{font-size:12px;color:#555;line-height:1.5}
+.room-code-big{font-size:40px;font-weight:800;letter-spacing:8px;color:#E8002D;margin:10px 0;font-variant-numeric:tabular-nums}
+.code-input{background:#1c1c1c;border:2px solid #333;border-radius:8px;color:#fff;padding:12px;width:100%;font-size:24px;font-family:inherit;text-align:center;letter-spacing:4px;text-transform:uppercase;margin-top:8px}
+.code-input:focus{outline:none;border-color:#0090FF}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<button class="fab" id="fab">+</button>
+<script>
+// ── Firebase config ─────────────────────────────────────────────────────────
+// Paste your Firebase config object here to enable sync.
+// Get it from: Firebase Console → Project Settings → Your Apps → Config
+// Example: { apiKey: "...", authDomain: "...", databaseURL: "...", projectId: "...", ... }
+const FIREBASE_CONFIG = {
+
+  apiKey: "AIzaSyC4ewP_5_veSVNgzUd3Wb9BT5KVmuS9yn4",
+
+  authDomain: "f1-tracker-5659e.firebaseapp.com",
+
+  databaseURL: "https://f1-tracker-5659e-default-rtdb.firebaseio.com",
+
+  projectId: "f1-tracker-5659e",
+
+  storageBucket: "f1-tracker-5659e.firebasestorage.app",
+
+  messagingSenderId: "914591562691",
+
+  appId: "1:914591562691:web:aca9ada62f02da5e245b76"
+
+};
+// ───────────────────────────────────────────────────────────────────────────
+
+const RACES=[
+  {id:"aus",name:"Australian GP",date:"Mar 8",ts:new Date("2026-03-08T05:00:00Z").getTime()},
+  {id:"chn",name:"Chinese GP",date:"Mar 22",ts:new Date("2026-03-22T07:00:00Z").getTime()},
+  {id:"jpn",name:"Japanese GP",date:"Apr 5",ts:new Date("2026-04-05T05:00:00Z").getTime()},
+  {id:"bhr",name:"Bahrain GP",date:"Apr 19",ts:new Date("2026-04-19T15:00:00Z").getTime()},
+  {id:"ksa",name:"Saudi Arabian GP",date:"May 3",ts:new Date("2026-05-03T17:00:00Z").getTime()},
+  {id:"mia",name:"Miami GP",date:"May 10",ts:new Date("2026-05-10T19:00:00Z").getTime()},
+  {id:"eri",name:"Emilia Romagna GP",date:"May 24",ts:new Date("2026-05-24T13:00:00Z").getTime()},
+  {id:"mon",name:"Monaco GP",date:"Jun 7",ts:new Date("2026-06-07T13:00:00Z").getTime()},
+  {id:"esp",name:"Spanish GP",date:"Jun 21",ts:new Date("2026-06-21T13:00:00Z").getTime()},
+  {id:"can",name:"Canadian GP",date:"Jul 5",ts:new Date("2026-07-05T18:00:00Z").getTime()},
+  {id:"aut",name:"Austrian GP",date:"Jul 12",ts:new Date("2026-07-12T13:00:00Z").getTime()},
+  {id:"gbr",name:"British GP",date:"Jul 26",ts:new Date("2026-07-26T14:00:00Z").getTime()},
+  {id:"hun",name:"Hungarian GP",date:"Aug 2",ts:new Date("2026-08-02T13:00:00Z").getTime()},
+  {id:"bel",name:"Belgian GP",date:"Aug 30",ts:new Date("2026-08-30T13:00:00Z").getTime()},
+  {id:"ned",name:"Dutch GP",date:"Sep 6",ts:new Date("2026-09-06T13:00:00Z").getTime()},
+  {id:"ita",name:"Italian GP",date:"Sep 13",ts:new Date("2026-09-13T13:00:00Z").getTime()},
+  {id:"aze",name:"Azerbaijan GP",date:"Sep 27",ts:new Date("2026-09-27T11:00:00Z").getTime()},
+  {id:"sgp",name:"Singapore GP",date:"Oct 4",ts:new Date("2026-10-04T12:00:00Z").getTime()},
+  {id:"usa",name:"United States GP",date:"Oct 18",ts:new Date("2026-10-18T19:00:00Z").getTime()},
+  {id:"mex",name:"Mexico City GP",date:"Oct 25",ts:new Date("2026-10-25T20:00:00Z").getTime()},
+  {id:"bra",name:"São Paulo GP",date:"Nov 8",ts:new Date("2026-11-08T17:00:00Z").getTime()},
+  {id:"lv",name:"Las Vegas GP",date:"Nov 21",ts:new Date("2026-11-21T06:00:00Z").getTime()},
+  {id:"qat",name:"Qatar GP",date:"Nov 29",ts:new Date("2026-11-29T13:00:00Z").getTime()},
+  {id:"abu",name:"Abu Dhabi GP",date:"Dec 6",ts:new Date("2026-12-06T13:00:00Z").getTime()},
+];
+
+const CATS=[
+  {id:"race_winner",   label:"Race Winner",           pts:3, emoji:"🏆",raceOnly:true, multi:0, ptsPerPick:0,opts:"drivers",     group:"standard"},
+  {id:"podium",        label:"Podium (Top 3)",         pts:7, emoji:"🥇",raceOnly:true, multi:3, ptsPerPick:7,opts:"drivers",     group:"standard"},
+  {id:"top_5",         label:"Top 5 Finish",           pts:5, emoji:"🔝",raceOnly:true, multi:5, ptsPerPick:5,opts:"drivers",     group:"standard"},
+  {id:"top_10",        label:"Top 10 Finish",          pts:2, emoji:"🔢",raceOnly:true, multi:10,ptsPerPick:2,opts:"drivers",     group:"standard"},
+  {id:"pole",          label:"Pole Position",          pts:2, emoji:"🚀",raceOnly:true, multi:0, ptsPerPick:0,opts:"drivers",     group:"standard"},
+  {id:"fastest_lap",   label:"Fastest Lap",            pts:1, emoji:"⚡",raceOnly:true, multi:0, ptsPerPick:0,opts:"drivers",     group:"standard"},
+  {id:"dotd",          label:"Driver of the Day",      pts:1, emoji:"⭐",raceOnly:true, multi:0, ptsPerPick:0,opts:"drivers",     group:"standard"},
+  {id:"dnf",           label:"DNF Prediction",         pts:2, emoji:"🔧",raceOnly:true, multi:0, ptsPerPick:0,opts:"drivers",     group:"standard"},
+  {id:"hat_trick",     label:"Hat Trick (Win+Pole+FL)",pts:15,emoji:"🎩",raceOnly:true, multi:0, ptsPerPick:0,opts:"drivers",     group:"risky"},
+  {id:"last_place",    label:"Last Place Finish",       pts:6, emoji:"💀",raceOnly:true, multi:0, ptsPerPick:0,opts:"drivers",     group:"risky"},
+  {id:"first_retire",  label:"First Retirement",        pts:5, emoji:"💥",raceOnly:true, multi:0, ptsPerPick:0,opts:"constructors",group:"risky"},
+  {id:"safety_car",    label:"Safety Car Appears",      pts:3, emoji:"🚨",raceOnly:true, multi:0, ptsPerPick:0,opts:"yesno",      group:"risky"},
+  {id:"red_flag",      label:"Red Flag Issued",         pts:6, emoji:"🚩",raceOnly:true, multi:0, ptsPerPick:0,opts:"yesno",      group:"risky"},
+  {id:"teammate_duel", label:"Teammate Duel Winner",    pts:4, emoji:"⚔️", raceOnly:true, multi:0, ptsPerPick:0,opts:"drivers",     group:"risky"},
+  {id:"comeback",      label:"Biggest Comeback Drive",  pts:5, emoji:"📈",raceOnly:true, multi:0, ptsPerPick:0,opts:"drivers",     group:"risky"},
+  {id:"most_overtakes",label:"Most Overtakes Driver",   pts:6, emoji:"🔀",raceOnly:true, multi:0, ptsPerPick:0,opts:"drivers",     group:"risky"},
+  {id:"fastest_pit",   label:"Fastest Pit Stop Team",   pts:4, emoji:"🔩",raceOnly:true, multi:0, ptsPerPick:0,opts:"constructors",group:"risky"},
+  {id:"exact_pos",     label:"Exact Finish Position",   pts:10,emoji:"🎯",raceOnly:true, multi:0, ptsPerPick:0,opts:"custom",      group:"risky"},
+  {id:"championship",  label:"Drivers' Championship",  pts:10,emoji:"👑",raceOnly:false,multi:0, ptsPerPick:0,opts:"drivers",     group:"season"},
+  {id:"constructors",  label:"Constructors' Champ.",    pts:5, emoji:"🏗️",raceOnly:false,multi:0, ptsPerPick:0,opts:"constructors",group:"season"},
+  {id:"custom",        label:"Custom Bet",              pts:1, emoji:"🎲",raceOnly:false,multi:0, ptsPerPick:0,opts:"custom",      group:"season"},
+];
+const RISKY=new Set(CATS.filter(c=>c.group==="risky").map(c=>c.id));
+const DRIVERS=["Max Verstappen","Isack Hadjar","Lewis Hamilton","Charles Leclerc","George Russell","Kimi Antonelli","Lando Norris","Oscar Piastri","Fernando Alonso","Lance Stroll","Esteban Ocon","Oliver Bearman","Pierre Gasly","Franco Colapinto","Nico Hülkenberg","Gabriel Bortoleto","Carlos Sainz","Alex Albon","Liam Lawson","Arvid Lindblad","Sergio Perez","Valtteri Bottas","Other / TBD"];
+const CONSTRUCTORS=["Red Bull","Ferrari","Mercedes","McLaren","Aston Martin","Alpine","Haas","Sauber / Audi","Williams","Racing Bulls","Cadillac"];
+const YESNO=["Yes","No"];
+const DEF_PTS={race_winner:3,podium:7,top_5:5,top_10:2,pole:2,fastest_lap:1,dotd:1,dnf:2,hat_trick:15,last_place:6,first_retire:5,safety_car:3,red_flag:6,teammate_duel:4,comeback:5,most_overtakes:6,fastest_pit:4,exact_pos:10,championship:10,constructors:5,custom:1};
+
+// Firebase
+let fbdb=null,syncRoom=null,syncUnsub=null,syncStatus="off";
+
+// App state
+let S={
+  players:{p1:"Player 1",p2:"Player 2"},
+  bets:[],view:"all",raceFilter:"all",
+  editingP:null,_nameInput:"",
+  addOpen:false,addForm:null,
+  settlingId:null,settlingActual:[],
+  editId:null,editForm:null,
+  addPickOpen:null,
+  confirmDelId:null,
+  syncOpen:false,joinOpen:false,
+  settingsOpen:false,exportOpen:false,
+  defaultPts:{...DEF_PTS}
+};
+
+// Firebase
+function initFB(){
+  if(!FIREBASE_CONFIG)return false;
+  try{if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);fbdb=firebase.database();return true;}
+  catch(e){return false;}
+}
+function startSync(code){
+  if(!fbdb&&!initFB()){alert("Firebase not configured.");return;}
+  if(syncUnsub){syncUnsub();syncUnsub=null;}
+  syncRoom=code;localStorage.setItem("f1_room",code);syncStatus="connecting";render();
+  const ref=fbdb.ref("rooms/"+code);
+  const h=ref.on("value",snap=>{
+    syncStatus="on";const d=snap.val();
+    if(d){S.bets=(d.bets||[]).map(b=>({...b,result:b.result??null}));S.players=d.players||S.players;S.defaultPts={...DEF_PTS,...(d.defaultPts||{})};}
+    render();
+  },()=>{syncStatus="off";render();});
+  syncUnsub=()=>ref.off("value",h);
+}
+function leaveRoom(){if(syncUnsub){syncUnsub();syncUnsub=null;}syncRoom=null;syncStatus="off";localStorage.removeItem("f1_room");render();}
+
+// Persist
+function load(){
+  try{const d=JSON.parse(localStorage.getItem("f1bt26")||"{}");S.bets=d.bets||[];S.players=d.players||S.players;S.defaultPts={...DEF_PTS,...(d.defaultPts||{})};}catch(e){}
+  const r=localStorage.getItem("f1_room");if(r&&initFB())startSync(r);
+}
+function save(){
+  const d={bets:S.bets,players:S.players,defaultPts:S.defaultPts};
+  try{localStorage.setItem("f1bt26",JSON.stringify(d));}catch(e){}
+  if(fbdb&&syncRoom)fbdb.ref("rooms/"+syncRoom).set(d).catch(()=>{});
+}
+
+// Helpers
+const uid=()=>Math.random().toString(36).slice(2,10);
+const genCode=()=>Math.random().toString(36).slice(2,8).toUpperCase();
+const cat=id=>CATS.find(c=>c.id===id)||CATS[CATS.length-1];
+const race=id=>RACES.find(r=>r.id===id);
+const esc=s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const p2=n=>String(n).padStart(2,"0");
+const isMulti=id=>cat(id).multi>0;
+const opts=id=>{const o=cat(id).opts;return o==="drivers"?DRIVERS:o==="constructors"?CONSTRUCTORS:o==="yesno"?YESNO:null;};
+const arr=v=>Array.isArray(v)?v.filter(Boolean):(v&&String(v).trim()?[String(v).trim()]:[]);
+const hasPick=v=>Array.isArray(v)?v.length>0:!!(v&&String(v).trim());
+const pickTxt=v=>arr(v).join(", ");
+const emptyPick=id=>isMulti(id)?[]:"";
+
+// Results
+const isMR=r=>r&&typeof r==="object"&&r.type==="multi";
+const isSettled=b=>b.result!=null;
+const p1pts=b=>{if(!b.result||b.result==="push")return 0;if(isMR(b.result))return b.result.p1Score;return b.result==="p1"?b.points:0;};
+const p2pts=b=>{if(!b.result||b.result==="push")return 0;if(isMR(b.result))return b.result.p2Score;return b.result==="p2"?b.points:0;};
+const mWin=r=>isMR(r)?(r.p1Score>r.p2Score?"p1":r.p2Score>r.p1Score?"p2":"tie"):null;
+const winSide=b=>!isSettled(b)||b.result==="push"?null:(isMR(b.result)?mWin(b.result):b.result);
+const calcMS=(b,actual)=>{
+  const ppp=cat(b.catId).ptsPerPick||b.ptsPerPick||0;
+  const p1a=arr(b.p1Pick),p2a=arr(b.p2Pick);
+  const p1c=p1a.filter(d=>actual.includes(d)).length,p2c=p2a.filter(d=>actual.includes(d)).length;
+  return{p1Score:p1c*ppp,p2Score:p2c*ppp,p1correct:p1c,p2correct:p2c};
+};
+
+// Countdown
+const nextRace=()=>RACES.find(r=>r.ts>Date.now())||null;
+const fmtCd=ms=>{if(ms<=0)return{d:0,h:0,m:0,s:0};const t=Math.floor(ms/1000);return{d:Math.floor(t/86400),h:Math.floor((t%86400)/3600),m:Math.floor((t%3600)/60),s:t%60};};
+
+// Stats
+function stats(){
+  const sett=S.bets.filter(b=>isSettled(b)&&b.result!=="push");
+  const ws=b=>winSide(b);
+  const p1w=sett.filter(b=>ws(b)==="p1"),p2w=sett.filter(b=>ws(b)==="p2");
+  const bt=[...sett].sort((a,b)=>a.ts-b.ts);
+  let streak="—";
+  if(bt.length){
+    const ls=ws(bt[bt.length-1]);let n=0;
+    for(let i=bt.length-1;i>=0;i--){if(ws(bt[i])===ls)n++;else break;}
+    const nm=ls==="p1"?S.players.p1:ls==="p2"?S.players.p2:"Tie";
+    streak=n>1?`${nm} ×${n}`:nm;
+  }
+  const bestCat=side=>{
+    const m={};sett.filter(b=>ws(b)===side).forEach(b=>{m[b.catId]=(m[b.catId]||0)+1;});
+    const best=Object.entries(m).sort((a,b)=>b[1]-a[1])[0];
+    return best?`${cat(best[0]).label} (${best[1]})`:"—";
+  };
+  const h2h=CATS.map(c=>{
+    const cs=sett.filter(b=>b.catId===c.id);
+    return{c,a:cs.filter(b=>ws(b)==="p1").length,b:cs.filter(b=>ws(b)==="p2").length,t:cs.length};
+  }).filter(x=>x.t>0);
+  return{total:sett.length,p1w:p1w.length,p2w:p2w.length,
+    tp1:S.bets.reduce((s,b)=>s+p1pts(b),0),tp2:S.bets.reduce((s,b)=>s+p2pts(b),0),
+    streak,bestCat,h2h,last10:bt.slice(-10)};
+}
+
+function exportTxt(){
+  const {p1,p2}=S.players;
+  const tp1=S.bets.reduce((s,b)=>s+p1pts(b),0),tp2=S.bets.reduce((s,b)=>s+p2pts(b),0);
+  const sett=S.bets.filter(b=>isSettled(b)&&b.result!=="push"),pend=S.bets.filter(b=>!isSettled(b));
+  let t=`F1 2026 BET TRACKER\n${"─".repeat(30)}\n${p1}: ${tp1}pts  |  ${p2}: ${tp2}pts\n${sett.length} settled · ${pend.length} pending\n\n`;
+  if(sett.length){t+="SETTLED\n";[...sett].sort((a,b)=>b.ts-a.ts).forEach(b=>{
+    if(isMR(b.result)){t+=`• ${b.description}\n  Actual: ${b.result.actual.join(", ")}\n  ${p1}: ${b.result.p1correct}/${arr(b.p1Pick).length}✓ +${b.result.p1Score}pts  ${p2}: ${b.result.p2correct}/${arr(b.p2Pick).length}✓ +${b.result.p2Score}pts\n`;}
+    else{const w=b.result==="p1"?p1:p2;t+=`• ${b.description}\n  ${w} wins — ${b.result==="p1"?pickTxt(b.p1Pick):pickTxt(b.p2Pick)} (+${b.points}pts)\n`;}
+    if(b.note)t+=`  💬 ${b.note}\n`;
+  });t+="\n";}
+  if(pend.length){t+="PENDING\n";[...pend].sort((a,b)=>b.ts-a.ts).forEach(b=>{
+    t+=`• ${b.description}\n`;
+    if(hasPick(b.p1Pick))t+=`  ${p1}: ${pickTxt(b.p1Pick)}\n`;
+    if(hasPick(b.p2Pick))t+=`  ${p2}: ${pickTxt(b.p2Pick)}\n`;
+    if(b.note)t+=`  💬 ${b.note}\n`;
+  });}
+  return t;
+}
+
+// Grid builder — cbPrefix is the start of the call e.g. "toggleMP('p1Pick','podium',"
+// so the final onclick becomes: toggleMP('p1Pick','podium','Max Verstappen')
+function driverGrid(drivers,sel,max,cbPrefix,cc){
+  const atMax=sel.length>=max;
+  return drivers.map(d=>{
+    const isSel=sel.includes(d),dis=!isSel&&atMax;
+    const sd=d.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+    return`<button type="button" class="driver-btn ${isSel?"sel-"+cc:dis?"maxed":""}" ${dis?"disabled":""} onclick="${cbPrefix}'${sd}')">${isSel?"✓ ":""}${esc(d)}</button>`;
+  }).join("");
+}
+function mPicker(fk,catId,sel,color,cc,tfn){
+  const max=cat(catId).multi,cnt=sel.length;
+  return`<div class="multi-pick-section"><div class="multi-pick-header"><span style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${color}">Up to ${max}</span><span class="mpc" style="background:${color}22;color:${color};border:1px solid ${color}55">${cnt}/${max}</span></div><div class="driver-grid">${driverGrid(DRIVERS,sel,max,`${tfn}('${fk}','${catId}',`,cc)}</div></div>`;
+}
+
+// Bet picks display
+function renderPicks(b,pl){
+  const multi=isMulti(b.catId),mr=isMR(b.result),ws=winSide(b);
+  if(!multi){
+    return`<div class="picks-inline">
+      ${hasPick(b.p1Pick)?`<span class="pick ${ws==="p1"?"win-red":"neutral"}">${ws==="p1"?"✓ ":""}<span class="who">${esc(pl.p1)}: </span>${esc(b.p1Pick)}</span>`:`<button onclick="openAddPick('${b.id}','p1')" style="background:none;border:1px dashed #333;border-radius:6px;color:#555;padding:4px 10px;font-size:12px;cursor:pointer;font-family:inherit">${esc(pl.p1)}: add pick…</button>`}
+      <span class="vs-small">vs</span>
+      ${hasPick(b.p2Pick)?`<span class="pick ${ws==="p2"?"win-blue":"neutral"}">${ws==="p2"?"✓ ":""}<span class="who">${esc(pl.p2)}: </span>${esc(b.p2Pick)}</span>`:`<button onclick="openAddPick('${b.id}','p2')" style="background:none;border:1px dashed #333;border-radius:6px;color:#555;padding:4px 10px;font-size:12px;cursor:pointer;font-family:inherit">${esc(pl.p2)}: add pick…</button>`}
+    </div>`;
+  }
+  const actual=mr?b.result.actual:[];
+  const mkPills=a=>a.map(d=>`<span class="pill ${mr?(actual.includes(d)?"correct":"wrong"):"neutral"}">${mr&&actual.includes(d)?"✓ ":""}${esc(d)}</span>`).join("");
+  const p1a=arr(b.p1Pick),p2a=arr(b.p2Pick);
+  const p1pills=p1a.length?mkPills(p1a):`<button onclick="openAddPick('${b.id}','p1')" style="background:none;border:1px dashed #333;border-radius:6px;color:#555;padding:3px 8px;font-size:12px;cursor:pointer;font-family:inherit">${esc(pl.p1)}: add picks…</button>`;
+  const p2pills=p2a.length?mkPills(p2a):`<button onclick="openAddPick('${b.id}','p2')" style="background:none;border:1px dashed #333;border-radius:6px;color:#555;padding:3px 8px;font-size:12px;cursor:pointer;font-family:inherit">${esc(pl.p2)}: add picks…</button>`;
+  return`<div>
+    <div class="multi-player-block"><div class="multi-player-lbl" style="color:#E8002D">${esc(pl.p1)}</div><div class="pill-row">${p1pills}</div></div>
+    <div class="multi-player-block"><div class="multi-player-lbl" style="color:#0090FF">${esc(pl.p2)}</div><div class="pill-row">${p2pills}</div></div>
+    ${mr&&actual.length?`<div class="actual-strip"><div class="actual-strip-lbl">Actual Finishers</div><div class="pill-row">${actual.map(d=>`<span class="pill actual">${esc(d)}</span>`).join("")}</div></div>`:""}
+    ${mr?`<div class="multi-score-row"><span class="msc red">${esc(pl.p1)}: ${b.result.p1correct}/${p1a.length}✓ +${b.result.p1Score}pts</span><span class="msc blue">${esc(pl.p2)}: ${b.result.p2correct}/${p2a.length}✓ +${b.result.p2Score}pts</span></div>`:""}
+  </div>`;
+}
+
+function catSelect(sel,onch){
+  const og=(g,label)=>`<optgroup label="${label}">${CATS.filter(c=>c.group===g).map(c=>`<option value="${c.id}"${sel===c.id?" selected":""}>${c.emoji} ${c.label}${c.ptsPerPick?` (${c.ptsPerPick}pts/✓)`:""}</option>`).join("")}</optgroup>`;
+  return`<select class="field-input" onchange="${onch}">${og("standard","── Standard GP")}${og("risky","── Risky GP 🔥")}${og("season","── Season")}</select>`;
+}
+function singleInput(side,catId,val,onch){
+  const o=opts(catId),c=side==="p1"?"#E8002D":"#0090FF",bc=val?c+"55":"#333";
+  if(o)return`<select class="field-input" style="border-color:${bc}" onchange="${onch}"><option value="">— Select —</option>${o.map(d=>`<option value="${d}"${val===d?" selected":""}>${d}</option>`).join("")}</select>`;
+  return`<input class="field-input" style="border-color:${bc}" value="${esc(val)}" placeholder="Type prediction…" oninput="${onch}"/>`;
+}
+function pickSection(s,pl,tfn,ufn){
+  if(isMulti(s.catId))return`<div class="picks-grid" style="margin-top:14px"><div><label class="field-lbl" style="color:#E8002D">${esc(pl.p1)}</label>${mPicker("p1Pick",s.catId,arr(s.p1Pick),"#E8002D","red",tfn)}</div><div><label class="field-lbl" style="color:#0090FF">${esc(pl.p2)}</label>${mPicker("p2Pick",s.catId,arr(s.p2Pick),"#0090FF","blue",tfn)}</div></div>`;
+  return`<div class="picks-grid"><div><label class="field-lbl" style="color:#E8002D">${esc(pl.p1)}</label>${singleInput("p1",s.catId,s.p1Pick||"",`${ufn}('p1Pick',this.value)`)}</div><div><label class="field-lbl" style="color:#0090FF">${esc(pl.p2)}</label>${singleInput("p2",s.catId,s.p2Pick||"",`${ufn}('p2Pick',this.value)`)}</div></div>`;
+}
+
+// Stats page
+function renderStats(){
+  const st=stats();
+  if(!st.total)return`<div class="stats-page"><div class="empty"><div style="font-size:36px;margin-bottom:10px">📊</div><div style="font-size:16px">No settled bets yet.</div></div></div>`;
+  const {p1,p2}=S.players;
+  const p1wr=Math.round(st.p1w/st.total*100),p2wr=Math.round(st.p2w/st.total*100);
+  const dots=st.last10.map(b=>`<span class="streak-dot" style="background:${winSide(b)==="p1"?"#E8002D":winSide(b)==="p2"?"#0090FF":"#555"}"></span>`).join(" ");
+  const h2hHTML=st.h2h.map(({c,a,b})=>`<div class="h2h-row"><span class="h2h-cat">${c.emoji} ${c.label}</span><div class="h2h-scores"><span class="h2h-score ${a>b?"red":"dim"}">${a}</span><span style="color:#333">—</span><span class="h2h-score ${b>a?"blue":"dim"}">${b}</span></div></div>`).join("");
+  return`<div class="stats-page">
+  <div class="stats-section"><div class="stats-title">Overview</div><div class="stat-cards">
+    <div class="stat-card"><div class="stat-val red">${st.p1w}</div><div class="stat-lbl">${esc(p1)} Wins · ${p1wr}%</div></div>
+    <div class="stat-card"><div class="stat-val blue">${st.p2w}</div><div class="stat-lbl">${esc(p2)} Wins · ${p2wr}%</div></div>
+    <div class="stat-card"><div class="stat-val gold">${st.tp1}</div><div class="stat-lbl">${esc(p1)} Total Points</div></div>
+    <div class="stat-card"><div class="stat-val gold">${st.tp2}</div><div class="stat-lbl">${esc(p2)} Total Points</div></div>
+  </div></div>
+  <div class="stats-section"><div class="stats-title">Streak</div>
+    <div style="background:#111;border:1px solid #1a1a1a;border-radius:10px;padding:14px">
+      <div style="font-size:20px;font-weight:700;margin-bottom:10px">${esc(st.streak)}</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">${dots}</div>
+      <div style="font-size:11px;color:#444;margin-top:8px">Last ${st.last10.length} · <span style="color:#E8002D">■</span>${esc(p1)} <span style="color:#0090FF">■</span>${esc(p2)}</div>
+    </div>
+  </div>
+  <div class="stats-section"><div class="stats-title">Best Category</div>
+    <div style="background:#111;border:1px solid #1a1a1a;border-radius:10px;padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div><div style="font-size:10px;color:#E8002D;letter-spacing:2px;margin-bottom:4px">${esc(p1.toUpperCase())}</div><div style="font-size:14px;color:#ccc">${st.bestCat("p1")}</div></div>
+      <div><div style="font-size:10px;color:#0090FF;letter-spacing:2px;margin-bottom:4px">${esc(p2.toUpperCase())}</div><div style="font-size:14px;color:#ccc">${st.bestCat("p2")}</div></div>
+    </div>
+  </div>
+  ${st.h2h.length?`<div class="stats-section"><div class="stats-title">Head-to-Head</div><div style="background:#111;border:1px solid #1a1a1a;border-radius:10px;padding:0 14px">${h2hHTML}</div></div>`:""}
+  </div>`;
+}
+
+// Main render
+function render(){
+  const pl=S.players,bets=S.bets;
+  const tp1=bets.reduce((s,b)=>s+p1pts(b),0),tp2=bets.reduce((s,b)=>s+p2pts(b),0);
+  const tot=tp1+tp2,pend=bets.filter(b=>!isSettled(b)).length,sett=bets.filter(b=>isSettled(b)).length;
+  const lead=tp1>tp2?"p1":tp2>tp1?"p2":null;
+  const nr=nextRace(),cd=nr?fmtCd(nr.ts-Date.now()):null;
+  const cdHTML=cd?`<div class="countdown">
+    <div class="cd-block"><div class="cd-num" id="cd-d">${cd.d}</div><div class="cd-lbl">Days</div></div>
+    <div class="cd-block"><div class="cd-num" id="cd-h">${p2(cd.h)}</div><div class="cd-lbl">Hrs</div></div>
+    <div class="cd-block"><div class="cd-num" id="cd-m">${p2(cd.m)}</div><div class="cd-lbl">Min</div></div>
+    <div class="cd-block"><div class="cd-num" id="cd-s">${p2(cd.s)}</div><div class="cd-lbl">Sec</div></div>
+  </div><div class="cd-race-name">Next: ${nr.name} · ${nr.date}</div>`:"";
+  const p1NH=S.editingP==="p1"?`<div class="name-edit"><input class="name-input p1" id="ni" value="${esc(S._nameInput||pl.p1)}"/><button class="confirm-btn p1" onclick="saveName()">✓</button></div>`:`<button class="player-name-btn p1" onclick="editName('p1')">${esc(pl.p1)}</button>`;
+  const p2NH=S.editingP==="p2"?`<div class="name-edit" style="flex-direction:row-reverse"><input class="name-input p2" id="ni" value="${esc(S._nameInput||pl.p2)}"/><button class="confirm-btn p2" onclick="saveName()">✓</button></div>`:`<button class="player-name-btn p2" onclick="editName('p2')">${esc(pl.p2)}</button>`;
+  const sdot=syncStatus==="on"?"on":syncStatus==="connecting"?"spin":"off";
+  const TABS=[["all","All"],["pending","Pending"],["settled","Settled"],["race","By Race"],["season","Season"],["stats","📊"]];
+  let content="";
+  if(S.view==="stats"){content=renderStats();}
+  else{
+    let db=[...bets];
+    if(S.view==="pending")db=bets.filter(b=>!isSettled(b));
+    else if(S.view==="settled")db=bets.filter(b=>isSettled(b));
+    else if(S.view==="race")db=S.raceFilter!=="all"?bets.filter(b=>b.race&&b.race.id===S.raceFilter):bets.filter(b=>b.race);
+    else if(S.view==="season")db=bets.filter(b=>!b.race);
+    const rf=S.view==="race"?`<div class="race-filter"><select onchange="setRF(this.value)"><option value="all">All Races</option>${RACES.map(r=>`<option value="${r.id}"${S.raceFilter===r.id?" selected":""}>${r.date} — ${r.name}</option>`).join("")}</select></div>`:"";
+    const cards=db.length===0?`<div class="empty"><div style="font-size:36px;margin-bottom:10px">🏎️</div><div style="font-size:16px">No bets here yet.</div><div style="font-size:13px;margin-top:4px">Hit + to add one!</div></div>`
+      :db.map(b=>{
+        const c=cat(b.catId),push=b.result==="push",mr=isMR(b.result),ws=winSide(b);
+        const bc=isSettled(b)?(push?"#333":ws==="p1"?"#E8002D33":ws==="p2"?"#0090FF33":"#333"):"#222";
+        const ptsH=push?`<div class="bet-pts" style="color:#555">—</div>`:mr?`<div class="multi-pts-col"><div class="mpt" style="color:#E8002D">+${p1pts(b)}pts</div><div class="mpt" style="color:#0090FF">+${p2pts(b)}pts</div></div>`:isSettled(b)?`<div class="bet-pts" style="color:${ws==="p1"?"#E8002D":"#0090FF"}">+${b.points}pts</div>`:`<div class="bet-pts" style="color:#fff">${b.points}pts</div>`;
+        return`<div class="bet-card" style="border:1px solid ${bc};opacity:${push?.5:1}">
+          <div class="bet-card-inner">
+            <div style="flex:1;min-width:0">
+              <div class="bet-meta"><span>${c.emoji}</span><span class="bet-cat-label">${c.label}</span>${c.ptsPerPick?`<span class="ppp-tag">${c.ptsPerPick}pts/✓</span>`:""}${RISKY.has(b.catId)?`<span class="risky-tag">RISKY</span>`:""}${b.race?`<span class="bet-race-tag">${esc(b.race.name)}</span>`:""}</div>
+              ${c.id==="custom"?`<p style="color:#ccc;font-size:14px;margin:0 0 8px;font-style:italic">${esc(b.description)}</p>`:""}
+              ${renderPicks(b,pl)}
+              ${b.note?`<div class="bet-note">💬 ${esc(b.note)}</div>`:""}
+            </div>
+            <div class="bet-right">${ptsH}
+              <div class="bet-actions">
+                ${!isSettled(b)?`<button class="settle-btn" style="background:#E8002D" onclick="openSettle('${b.id}')">Settle</button>`:""}
+                <button class="edit-btn" onclick="openEdit('${b.id}')">✏️ Edit</button>
+                <button class="delete-btn" onclick="delBet('${b.id}')">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }).join("");
+    content=rf+`<div class="bet-list">${cards}</div>`;
+  }
+  document.getElementById("app").innerHTML=`
+    <div class="header">
+      <div class="header-top">
+        <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:2px"><span class="f1-badge">F1</span><span class="season-label">2026 SEASON</span></div><h1>BET TRACKER</h1></div>
+        <div class="bet-count"><div>${bets.length} total bets</div><div>${pend} pending · ${sett} settled</div>
+          <div class="header-btns">
+            <button class="hbtn" onclick="openSync()"><span class="sync-dot ${sdot}"></span>${syncRoom||"Sync"}</button>
+            <button class="hbtn" onclick="openExport()">📤</button>
+            <button class="hbtn" onclick="openSettings()">⚙</button>
+          </div>
+        </div>
+      </div>
+      <div class="scoreboard">
+        <div class="score-col">${p1NH}<div class="score-pts ${lead==="p1"?"bright":"dim"}">${tp1}</div><div class="score-label">POINTS</div>${lead==="p1"?`<div class="leading-badge p1">▲ LEADING</div>`:""}</div>
+        <div class="vs-col"><div class="vs-line"></div><span class="vs-text">VS</span><div class="vs-line"></div></div>
+        <div class="score-col right">${p2NH}<div class="score-pts ${lead==="p2"?"bright":"dim"}">${tp2}</div><div class="score-label">POINTS</div>${lead==="p2"?`<div class="leading-badge p2">▲ LEADING</div>`:""}</div>
+      </div>
+      ${tot>0?`<div class="pts-bar-wrap"><div class="pts-bar" style="width:${tp1/tot*100}%"></div></div>`:""}
+      ${cdHTML}
+    </div>
+    <div class="tabs">${TABS.map(([t,l])=>`<button class="tab ${S.view===t?"active":"inactive"}" onclick="setView('${t}')">${l}</button>`).join("")}</div>
+    ${content}`;
+  if(S.editingP){const ni=document.getElementById("ni");if(ni){ni.focus();ni.select();ni.oninput=e=>S._nameInput=e.target.value;ni.onkeydown=e=>{if(e.key==="Enter")saveName();};}}
+  renderModals();
+}
+
+function renderModals(){
+  document.querySelectorAll(".overlay").forEach(e=>e.remove());
+
+  // Sync modal
+  if(S.syncOpen){
+    const hasFB=!!FIREBASE_CONFIG;
+    const div=document.createElement("div");div.className="overlay";
+    if(syncRoom){
+      div.innerHTML=`<div class="modal" style="max-width:360px"><div class="modal-hdr"><span class="modal-title">🔄 SYNC</span><button class="close-btn" onclick="closeSync()">✕</button></div>
+        <div style="display:flex;align-items:center;gap:8px;background:#0a1a0a;border:1px solid #1e3a1e;border-radius:8px;padding:10px 14px;margin-bottom:16px"><span class="sync-dot ${syncStatus==="on"?"on":"spin"}"></span><span style="font-size:13px;color:#ccc">${syncStatus==="on"?"Connected & syncing":"Connecting…"}</span></div>
+        <div style="background:#0d0d0d;border:2px solid #E8002D44;border-radius:10px;padding:20px;text-align:center;margin-bottom:16px">
+          <div style="font-size:11px;color:#555;letter-spacing:2px;text-transform:uppercase">Room Code</div>
+          <div class="room-code-big">${syncRoom}</div>
+          <div style="font-size:12px;color:#555">Share with the other player</div>
+        </div>
+        <button id="cpyBtn" onclick="copyCode()" style="width:100%;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#ccc;padding:11px 0;cursor:pointer;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;font-family:inherit;margin-bottom:8px">Copy Room Code</button>
+        <button onclick="leaveRoom();closeSync();" style="width:100%;background:none;border:1px solid #2a2a2a;border-radius:8px;color:#555;padding:10px 0;cursor:pointer;font-size:12px;letter-spacing:1px;text-transform:uppercase;font-family:inherit">Leave Room</button>
+      </div>`;
+    } else if(!hasFB){
+      div.innerHTML=`<div class="modal" style="max-width:420px"><div class="modal-hdr"><span class="modal-title">🔄 SETUP SYNC</span><button class="close-btn" onclick="closeSync()">✕</button></div>
+        <p style="color:#888;font-size:13px;line-height:1.7;margin-bottom:14px">Sync needs a free Firebase database. Setup takes ~3 minutes:</p>
+        <div style="background:#0d0d0d;border:1px solid #1e1e1e;border-radius:8px;padding:16px;font-size:13px;line-height:2.2;color:#aaa">
+          <div><strong style="color:#E8002D">1.</strong> Go to <strong style="color:#fff">console.firebase.google.com</strong></div>
+          <div><strong style="color:#E8002D">2.</strong> Create a project (name it anything)</div>
+          <div><strong style="color:#E8002D">3.</strong> Left menu → <strong style="color:#fff">Build → Realtime Database</strong></div>
+          <div><strong style="color:#E8002D">4.</strong> Create database → <strong style="color:#fff">Start in test mode</strong></div>
+          <div><strong style="color:#E8002D">5.</strong> Gear icon → <strong style="color:#fff">Project Settings</strong></div>
+          <div><strong style="color:#E8002D">6.</strong> Scroll to "Your apps" → click <strong style="color:#fff">&lt;/&gt;</strong></div>
+          <div><strong style="color:#E8002D">7.</strong> Copy the <strong style="color:#fff">firebaseConfig</strong> object</div>
+          <div><strong style="color:#E8002D">8.</strong> Open this HTML file in a text editor → paste config where it says <strong style="color:#fff">FIREBASE_CONFIG = null</strong></div>
+        </div>
+        <button onclick="closeSync()" style="margin-top:16px;width:100%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;color:#888;padding:11px 0;cursor:pointer;font-size:13px;font-family:inherit">Got it</button>
+      </div>`;
+    } else {
+      div.innerHTML=`<div class="modal" style="max-width:360px"><div class="modal-hdr"><span class="modal-title">🔄 SYNC</span><button class="close-btn" onclick="closeSync()">✕</button></div>
+        <p style="color:#888;font-size:13px;margin-bottom:16px">Both players join the same room — bets sync in real time.</p>
+        <div class="sync-opt" onclick="createRoom()"><div class="sync-opt-icon">✨</div><div class="sync-opt-title">Create New Room</div><div class="sync-opt-desc">Generate a room code and share it with the other player</div></div>
+        <div class="sync-opt" onclick="showJoin()"><div class="sync-opt-icon">🔑</div><div class="sync-opt-title">Join Existing Room</div><div class="sync-opt-desc">Enter a code from the other player</div></div>
+      </div>`;
+    }
+    document.body.appendChild(div);
+  }
+
+  // Join room
+  if(S.joinOpen){
+    const div=document.createElement("div");div.className="overlay";
+    div.innerHTML=`<div class="modal" style="max-width:340px"><div class="modal-hdr"><span class="modal-title">JOIN ROOM</span><button class="close-btn" onclick="closeJoin()">✕</button></div>
+      <p style="color:#888;font-size:13px;margin-bottom:14px">Enter the 6-character code from the other player.</p>
+      <input class="code-input" id="jci" maxlength="6" placeholder="ABC123" oninput="this.value=this.value.toUpperCase()"/>
+      <button onclick="doJoin()" style="margin-top:14px;width:100%;background:#0090FF;border:none;border-radius:8px;color:#fff;padding:12px 0;font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:inherit">Join</button>
+    </div>`;
+    document.body.appendChild(div);
+    setTimeout(()=>{const i=document.getElementById("jci");if(i)i.focus();},50);
+  }
+
+  // Add bet
+  if(S.addOpen&&S.addForm){
+    const s=S.addForm,c=cat(s.catId),multi=isMulti(s.catId);
+    const p1v=multi?arr(s.p1Pick):s.p1Pick,p2v=multi?arr(s.p2Pick):s.p2Pick;
+    const ready=(multi?(p1v.length>0||p2v.length>0):(p1v||p2v))&&(s.catId!=="custom"||s.customDesc.trim());
+    const div=document.createElement("div");div.className="overlay";
+    div.innerHTML=`<div class="modal"><div class="modal-hdr"><span class="modal-title">NEW BET</span><button class="close-btn" onclick="closeAdd()">✕</button></div>
+      <label class="field-lbl">Category</label>${catSelect(s.catId,"updateCat(this.value)")}
+      ${c.raceOnly?`<label class="field-lbl">Race</label><select class="field-input" onchange="upd('raceId',this.value)">${RACES.map(r=>`<option value="${r.id}"${s.raceId===r.id?" selected":""}>${r.date} — ${r.name}</option>`).join("")}</select>`:""}
+      ${s.catId==="custom"?`<label class="field-lbl">Description</label><input class="field-input" value="${esc(s.customDesc)}" placeholder="e.g. Norris hat-trick…" oninput="upd('customDesc',this.value)"/>`:""}
+      ${multi?`<div style="background:#0a180a;border:1px solid #1e3a1e;border-radius:6px;padding:8px 12px;font-size:12px;color:#4a8a4a;margin-top:12px">🎯 <strong>${c.ptsPerPick} pts per correct pick</strong> — scored individually after the race.</div>`:""}
+      ${pickSection(s,S.players,"toggleMP","upd")}
+      <p style="font-size:11px;color:#444;margin-top:8px">At least one pick required.</p>
+      <label class="field-lbl">${multi?"Pts per Correct Pick":"Points at Stake"}</label>
+      <input class="pts-input" type="number" min="1" max="99" value="${s.pts}" oninput="upd('pts',+this.value)"/>
+      <label class="field-lbl">Note <span style="color:#444">(optional)</span></label>
+      <input class="field-input" value="${esc(s.note||"")}" placeholder="Any extra context…" oninput="upd('note',this.value)"/>
+      <button class="lock-btn" style="background:${ready?"#E8002D":"#1a1a1a"};color:${ready?"#fff":"#555"}" onclick="submitBet()">Lock In Bet</button>
+    </div>`;document.body.appendChild(div);
+  }
+
+  // Add pick
+  if(S.addPickOpen){
+    const {betId,side}=S.addPickOpen,b=S.bets.find(x=>x.id===betId);
+    if(b){
+      const multi=isMulti(b.catId),c=cat(b.catId),color=side==="p1"?"#E8002D":"#0090FF",cc=side==="p1"?"red":"blue";
+      const nm=side==="p1"?S.players.p1:S.players.p2;
+      let inp;
+      if(multi){
+        const sel=S.addPickOpen.multiSel||[],max=c.multi;
+        inp=`<div class="multi-pick-section"><div class="multi-pick-header"><span style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${color}">Up to ${max}</span><span class="mpc" style="background:${color}22;color:${color};border:1px solid ${color}55">${sel.length}/${max}</span></div><div class="driver-grid">${driverGrid(DRIVERS,sel,max,`tMPModal('${betId}','${side}','${b.catId}',`,cc)}</div></div>`;
+      } else {
+        inp=singleInput(side,b.catId,S.addPickOpen.val||"","S.addPickOpen.val=this.value");
+      }
+      const div=document.createElement("div");div.className="overlay";
+      div.innerHTML=`<div class="modal" style="max-width:420px"><div class="modal-hdr"><span class="modal-title" style="color:${color}">${esc(nm)}'s Pick${multi?"s":""}</span><button class="close-btn" onclick="closeAddPick()">✕</button></div>
+        <p style="color:#666;font-size:13px;margin-bottom:14px">${c.emoji} ${esc(b.description)}</p>
+        ${inp}
+        <button onclick="saveAddPick()" style="margin-top:16px;width:100%;background:${color};border:none;border-radius:8px;color:#fff;padding:12px 0;font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:inherit">Save</button>
+      </div>`;document.body.appendChild(div);
+    }
+  }
+
+  // Settle
+  if(S.settlingId){
+    const b=S.bets.find(x=>x.id===S.settlingId);
+    if(b){
+      const c=cat(b.catId),multi=isMulti(b.catId);
+      const div=document.createElement("div");div.className="overlay";
+      if(multi){
+        const actual=S.settlingActual,max=c.multi,sc=calcMS(b,actual);
+        const p1a=arr(b.p1Pick),p2a=arr(b.p2Pick);
+        div.innerHTML=`<div class="modal"><div class="modal-hdr"><span class="modal-title">SETTLE · ${c.emoji} ${c.label.toUpperCase()}</span><button class="close-btn" onclick="closeSettle()">✕</button></div>
+          <p style="color:#888;font-size:13px;margin-bottom:14px">Select actual top ${max} finishers.</p>
+          <div class="multi-pick-section"><div class="multi-pick-header"><span style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#f5c518">Actual finishers</span><span class="mpc" style="background:#f5c51822;color:#f5c518;border:1px solid #f5c51855">${actual.length}/${max}</span></div><div class="driver-grid">${driverGrid(DRIVERS,actual,max,"tActual(","gold")}</div></div>
+          <div class="score-preview">
+            <div style="font-size:10px;color:#555;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Score Preview</div>
+            <div class="score-preview-row"><span style="color:#E8002D;font-weight:700">${esc(S.players.p1)}</span><span style="color:#E8002D">${sc.p1correct}/${p1a.length} correct → <strong>+${sc.p1Score}pts</strong></span></div>
+            <div class="score-preview-row"><span style="color:#0090FF;font-weight:700">${esc(S.players.p2)}</span><span style="color:#0090FF">${sc.p2correct}/${p2a.length} correct → <strong>+${sc.p2Score}pts</strong></span></div>
+          </div>
+          <button onclick="settleMulti()" style="margin-top:14px;width:100%;background:#E8002D;border:none;border-radius:8px;color:#fff;padding:12px 0;font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:inherit">Confirm</button>
+          <button class="void-btn" onclick="settleSingle('push')">Push / Void</button>
+        </div>`;
+      } else {
+        const p1d=esc(b.p1Pick)||'<em style="opacity:.4;font-size:12px">No pick</em>';
+        const p2d=esc(b.p2Pick)||'<em style="opacity:.4;font-size:12px">No pick</em>';
+        div.innerHTML=`<div class="modal" style="max-width:400px"><div class="modal-hdr"><span class="modal-title">SETTLE BET</span><button class="close-btn" onclick="closeSettle()">✕</button></div>
+          <p style="color:#888;font-size:14px;margin-bottom:20px">${c.emoji} ${esc(b.description)}</p>
+          <div class="settle-grid">
+            <button class="settle-opt red" onclick="settleSingle('p1')"><div style="font-size:11px;opacity:.7;margin-bottom:6px">${esc(S.players.p1)} WINS</div>${p1d}<div style="margin-top:8px;font-size:12px">+${b.points}pts</div></button>
+            <button class="settle-opt blue" onclick="settleSingle('p2')"><div style="font-size:11px;opacity:.7;margin-bottom:6px">${esc(S.players.p2)} WINS</div>${p2d}<div style="margin-top:8px;font-size:12px">+${b.points}pts</div></button>
+          </div>
+          <button class="void-btn" onclick="settleSingle('push')">Push / Void</button>
+        </div>`;
+      }
+      document.body.appendChild(div);
+    }
+  }
+
+  // Edit
+  if(S.editId&&S.editForm){
+    const b=S.bets.find(x=>x.id===S.editId);
+    if(b){
+      const ef=S.editForm,c=cat(ef.catId),multi=isMulti(ef.catId),sett=isSettled(b);
+      const div=document.createElement("div");div.className="overlay";
+      div.innerHTML=`<div class="modal"><div class="modal-hdr"><span class="modal-title">✏️ EDIT</span><button class="close-btn" onclick="closeEdit()">✕</button></div>
+        ${sett?`<div style="background:#1a1200;border:1px solid #3a2e00;border-radius:6px;padding:8px 12px;font-size:12px;color:#998800;margin-bottom:14px">⚠ Settled — category &amp; race locked</div>`:""}
+        <label class="field-lbl">Category</label>${sett?`<div class="field-input" style="opacity:.4">${c.emoji} ${c.label}</div>`:catSelect(ef.catId,"updateEditCat(this.value)")}
+        ${c.raceOnly?`<label class="field-lbl">Race</label><select class="field-input" ${sett?"disabled style='opacity:.4'":""} onchange="updE('raceId',this.value)">${RACES.map(r=>`<option value="${r.id}"${ef.raceId===r.id?" selected":""}>${r.date} — ${r.name}</option>`).join("")}</select>`:""}
+        ${ef.catId==="custom"?`<label class="field-lbl">Description</label><input class="field-input" value="${esc(ef.customDesc)}" oninput="updE('customDesc',this.value)"/>`:""}
+        ${pickSection(ef,S.players,"toggleMPE","updE")}
+        <label class="field-lbl">${multi?"Pts per Correct Pick":"Points at Stake"}</label>
+        <input class="pts-input" type="number" min="1" max="99" value="${ef.pts}" oninput="updE('pts',+this.value)"/>
+        <label class="field-lbl">Note <span style="color:#444">(optional)</span></label>
+        <input class="field-input" value="${esc(ef.note||"")}" oninput="updE('note',this.value)"/>
+        <button class="lock-btn" style="background:#E8002D;color:#fff" onclick="saveEdit()">Save Changes</button>
+      </div>`;document.body.appendChild(div);
+    }
+  }
+
+  // Settings
+  if(S.settingsOpen){
+    const div=document.createElement("div");div.className="overlay";
+    div.innerHTML=`<div class="modal" style="max-width:400px"><div class="modal-hdr"><span class="modal-title">⚙ SETTINGS</span><button class="close-btn" onclick="closeSettings()">✕</button></div>
+      <p style="color:#666;font-size:13px;margin-bottom:16px">Default points per bet type.</p>
+      ${CATS.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #1a1a1a"><span style="font-size:13px;color:#ccc">${c.emoji} ${c.label}${c.ptsPerPick?` <span style="color:#555;font-size:10px">(per✓)</span>`:""}</span><div style="display:flex;align-items:center;gap:8px"><button onclick="adjDef('${c.id}',-1)" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:4px;color:#aaa;width:28px;height:28px;cursor:pointer;font-size:16px;font-family:inherit">−</button><span style="color:#fff;font-size:16px;font-weight:700;min-width:24px;text-align:center">${S.defaultPts[c.id]||1}</span><button onclick="adjDef('${c.id}',1)" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:4px;color:#aaa;width:28px;height:28px;cursor:pointer;font-size:16px;font-family:inherit">+</button></div></div>`).join("")}
+      <button onclick="resetDefs()" style="margin-top:16px;width:100%;background:none;border:1px solid #2a2a2a;border-radius:7px;color:#555;padding:9px 0;cursor:pointer;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;font-family:inherit">Reset to Defaults</button>
+    </div>`;document.body.appendChild(div);
+  }
+
+  // Delete confirm
+  if(S.confirmDelId){
+    const b=S.bets.find(x=>x.id===S.confirmDelId);
+    if(b){
+      const c=cat(b.catId);
+      const div=document.createElement("div");div.className="overlay";
+      div.innerHTML=`<div class="modal" style="max-width:340px;text-align:center">
+        <div style="font-size:28px;margin-bottom:12px">🗑️</div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:8px">Delete this bet?</div>
+        <div style="font-size:13px;color:#666;margin-bottom:24px">${c.emoji} ${esc(b.description)}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <button onclick="cancelDel()" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;color:#aaa;padding:11px 0;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit">Cancel</button>
+          <button onclick="confirmDel()" style="background:#E8002D;border:none;border-radius:8px;color:#fff;padding:11px 0;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit">Delete</button>
+        </div>
+      </div>`;document.body.appendChild(div);
+    }
+  }
+
+  // Export
+  if(S.exportOpen){
+    const txt=exportTxt();
+    const div=document.createElement("div");div.className="overlay";
+    div.innerHTML=`<div class="modal" style="max-width:480px"><div class="modal-hdr"><span class="modal-title">📤 EXPORT</span><button class="close-btn" onclick="closeExport()">✕</button></div>
+      <div class="export-box">${esc(txt)}</div>
+      <button class="action-btn" id="cpyExBtn" onclick="doCopy()" style="background:#222;border:1px solid #333;color:#fff">Copy to Clipboard</button>
+      <button class="action-btn" onclick="doDownload()" style="background:#1a1a1a;border:1px solid #2a2a2a;color:#888">Download .txt</button>
+    </div>`;document.body.appendChild(div);
+  }
+}
+
+// ── Actions ──
+function setView(v){S.view=v;render();}
+function setRF(v){S.raceFilter=v;render();}
+function editName(k){S.editingP=k;S._nameInput=S.players[k];render();}
+function saveName(){if(S._nameInput.trim())S.players[S.editingP]=S._nameInput.trim();S.editingP=null;save();render();}
+
+function openSync(){S.syncOpen=true;renderModals();}
+function closeSync(){S.syncOpen=false;renderModals();}
+function createRoom(){startSync(genCode());S.syncOpen=true;renderModals();}
+function showJoin(){S.syncOpen=false;S.joinOpen=true;renderModals();}
+function closeJoin(){S.joinOpen=false;renderModals();}
+function doJoin(){const i=document.getElementById("jci"),code=(i?i.value:"").trim().toUpperCase();if(code.length>=4){startSync(code);S.joinOpen=false;S.syncOpen=true;renderModals();}}
+function copyCode(){if(!syncRoom)return;navigator.clipboard.writeText(syncRoom).then(()=>{const b=document.getElementById("cpyBtn");if(b){b.textContent="✓ Copied!";b.style.color="#4caf50";setTimeout(()=>{b.textContent="Copy Room Code";b.style.color="#ccc";},2000);}}).catch(()=>{});}
+
+function openSettle(id){S.settlingId=id;S.settlingActual=[];renderModals();}
+function closeSettle(){S.settlingId=null;S.settlingActual=[];renderModals();}
+function tActual(driver){
+  const b=S.bets.find(x=>x.id===S.settlingId),max=cat(b.catId).multi,a=S.settlingActual;
+  S.settlingActual=a.includes(driver)?a.filter(d=>d!==driver):a.length<max?[...a,driver]:a;renderModals();
+}
+function settleSingle(r){S.bets=S.bets.map(b=>b.id===S.settlingId?{...b,result:r}:b);S.settlingId=null;S.settlingActual=[];save();render();}
+function settleMulti(){
+  const b=S.bets.find(x=>x.id===S.settlingId),sc=calcMS(b,S.settlingActual);
+  S.bets=S.bets.map(x=>x.id===S.settlingId?{...x,result:{type:"multi",...sc,actual:S.settlingActual}}:x);
+  S.settlingId=null;S.settlingActual=[];save();render();
+}
+
+function delBet(id){S.confirmDelId=id;renderModals();}
+function confirmDel(){S.bets=S.bets.filter(b=>b.id!==S.confirmDelId);S.confirmDelId=null;save();render();}
+function cancelDel(){S.confirmDelId=null;renderModals();}
+
+function closeAdd(){S.addOpen=false;renderModals();}
+function upd(k,v){S.addForm[k]=v;renderModals();}
+function updateCat(catId){S.addForm={...S.addForm,catId,p1Pick:emptyPick(catId),p2Pick:emptyPick(catId),pts:S.defaultPts[catId]||1};renderModals();}
+function toggleMP(fk,catId,driver){const max=cat(catId).multi;let a=arr(S.addForm[fk]);a=a.includes(driver)?a.filter(d=>d!==driver):a.length<max?[...a,driver]:a;S.addForm[fk]=a;renderModals();}
+function submitBet(){
+  const s=S.addForm,c=cat(s.catId),multi=isMulti(s.catId);
+  const p1v=multi?arr(s.p1Pick):s.p1Pick,p2v=multi?arr(s.p2Pick):s.p2Pick;
+  if(multi?(p1v.length===0&&p2v.length===0):(!p1v&&!p2v))return;
+  if(s.catId==="custom"&&!s.customDesc.trim())return;
+  const r=c.raceOnly?race(s.raceId):null;
+  const desc=s.catId==="custom"?s.customDesc:`${c.label}${r?` · ${r.name}`:""}`;
+  S.bets.unshift({id:uid(),catId:s.catId,race:r||null,p1Pick:multi?p1v:(p1v||""),p2Pick:multi?p2v:(p2v||""),description:desc,points:s.pts,ptsPerPick:c.ptsPerPick,result:null,note:s.note||"",ts:Date.now()});
+  S.addOpen=false;save();render();
+}
+
+function openAddPick(betId,side){const b=S.bets.find(x=>x.id===betId);S.addPickOpen={betId,side,val:"",multiSel:arr(side==="p1"?b.p1Pick:b.p2Pick)};renderModals();}
+function closeAddPick(){S.addPickOpen=null;renderModals();}
+function tMPModal(betId,side,catId,driver){if(!S.addPickOpen)return;const max=cat(catId).multi;let a=arr(S.addPickOpen.multiSel);a=a.includes(driver)?a.filter(d=>d!==driver):a.length<max?[...a,driver]:a;S.addPickOpen.multiSel=a;renderModals();}
+function saveAddPick(){
+  const {betId,side}=S.addPickOpen,b=S.bets.find(x=>x.id===betId),multi=isMulti(b.catId);
+  const nv=multi?S.addPickOpen.multiSel:S.addPickOpen.val;
+  if(multi?nv.length===0:(!nv||!String(nv).trim()))return;
+  S.bets=S.bets.map(x=>x.id===betId?{...x,[side==="p1"?"p1Pick":"p2Pick"]:nv}:x);
+  S.addPickOpen=null;save();render();
+}
+
+function openEdit(id){
+  const b=S.bets.find(x=>x.id===id);if(!b)return;
+  const multi=isMulti(b.catId);
+  S.editId=id;S.editForm={catId:b.catId,raceId:b.race?b.race.id:"aus",p1Pick:multi?arr(b.p1Pick):(b.p1Pick||""),p2Pick:multi?arr(b.p2Pick):(b.p2Pick||""),customDesc:b.catId==="custom"?b.description:"",pts:b.points,note:b.note||""};renderModals();
+}
+function closeEdit(){S.editId=null;S.editForm=null;renderModals();}
+function updE(k,v){if(S.editForm)S.editForm[k]=v;renderModals();}
+function updateEditCat(catId){if(!S.editForm)return;S.editForm={...S.editForm,catId,p1Pick:emptyPick(catId),p2Pick:emptyPick(catId)};renderModals();}
+function toggleMPE(fk,catId,driver){if(!S.editForm)return;const max=cat(catId).multi;let a=arr(S.editForm[fk]);a=a.includes(driver)?a.filter(d=>d!==driver):a.length<max?[...a,driver]:a;S.editForm[fk]=a;renderModals();}
+function saveEdit(){
+  const ef=S.editForm,id=S.editId,b=S.bets.find(x=>x.id===id);if(!ef||!b)return;
+  const c=cat(ef.catId),multi=isMulti(ef.catId),r=c.raceOnly?race(ef.raceId):null;
+  const desc=ef.catId==="custom"?ef.customDesc:`${c.label}${r?` · ${r.name}`:""}`;
+  S.bets=S.bets.map(x=>x.id===id?{...x,catId:ef.catId,race:r||null,p1Pick:multi?arr(ef.p1Pick):(ef.p1Pick||""),p2Pick:multi?arr(ef.p2Pick):(ef.p2Pick||""),description:desc,points:ef.pts,ptsPerPick:c.ptsPerPick,note:ef.note||""}:x);
+  S.editId=null;S.editForm=null;save();render();
+}
+
+function openSettings(){S.settingsOpen=true;renderModals();}
+function closeSettings(){S.settingsOpen=false;renderModals();}
+function adjDef(id,d){
+  const modal=document.querySelector(".overlay .modal");
+  const scrollTop=modal?modal.scrollTop:0;
+  S.defaultPts[id]=Math.max(1,Math.min(99,(S.defaultPts[id]||1)+d));save();renderModals();
+  const newModal=document.querySelector(".overlay .modal");
+  if(newModal)newModal.scrollTop=scrollTop;
+}
+function resetDefs(){S.defaultPts={...DEF_PTS};save();renderModals();}
+
+function openExport(){S.exportOpen=true;renderModals();}
+function closeExport(){S.exportOpen=false;renderModals();}
+function doCopy(){navigator.clipboard.writeText(exportTxt()).then(()=>{const b=document.getElementById("cpyExBtn");if(b){b.textContent="✓ Copied!";b.style.background="#1a3a1a";b.style.color="#4caf50";setTimeout(()=>{b.textContent="Copy to Clipboard";b.style.background="#222";b.style.color="#fff";},2000);}}).catch(()=>{});}
+function doDownload(){const a=document.createElement("a");a.href="data:text/plain;charset=utf-8,"+encodeURIComponent(exportTxt());a.download="f1-bets-2026.txt";a.click();}
+
+document.getElementById("fab").onclick=()=>{
+  const catId="race_winner";
+  S.addForm={catId,raceId:"aus",p1Pick:emptyPick(catId),p2Pick:emptyPick(catId),customDesc:"",pts:S.defaultPts[catId],note:""};
+  S.addOpen=true;renderModals();
+};
+
+setInterval(()=>{
+  const nr=nextRace();if(!nr)return;
+  const cd=fmtCd(nr.ts-Date.now());
+  [["cd-d",cd.d],["cd-h",p2(cd.h)],["cd-m",p2(cd.m)],["cd-s",p2(cd.s)]].forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.textContent=v;});
+},1000);
+
+load();render();
+</script>
+</body>
+</html>
