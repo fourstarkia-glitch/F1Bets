@@ -176,30 +176,36 @@ const FIREBASE_CONFIG = {
 // ───────────────────────────────────────────────────────────────────────────
 
 const RACES=[
-  {id:"aus",name:"Australian GP",date:"Mar 8",ts:new Date("2026-03-08T05:00:00Z").getTime()},
-  {id:"chn",name:"Chinese GP",date:"Mar 22",ts:new Date("2026-03-22T07:00:00Z").getTime()},
-  {id:"jpn",name:"Japanese GP",date:"Apr 5",ts:new Date("2026-04-05T05:00:00Z").getTime()},
-  {id:"bhr",name:"Bahrain GP",date:"Apr 19",ts:new Date("2026-04-19T15:00:00Z").getTime()},
-  {id:"ksa",name:"Saudi Arabian GP",date:"May 3",ts:new Date("2026-05-03T17:00:00Z").getTime()},
-  {id:"mia",name:"Miami GP",date:"May 10",ts:new Date("2026-05-10T19:00:00Z").getTime()},
-  {id:"eri",name:"Emilia Romagna GP",date:"May 24",ts:new Date("2026-05-24T13:00:00Z").getTime()},
-  {id:"mon",name:"Monaco GP",date:"Jun 7",ts:new Date("2026-06-07T13:00:00Z").getTime()},
-  {id:"esp",name:"Spanish GP",date:"Jun 21",ts:new Date("2026-06-21T13:00:00Z").getTime()},
-  {id:"can",name:"Canadian GP",date:"Jul 5",ts:new Date("2026-07-05T18:00:00Z").getTime()},
-  {id:"aut",name:"Austrian GP",date:"Jul 12",ts:new Date("2026-07-12T13:00:00Z").getTime()},
-  {id:"gbr",name:"British GP",date:"Jul 26",ts:new Date("2026-07-26T14:00:00Z").getTime()},
-  {id:"hun",name:"Hungarian GP",date:"Aug 2",ts:new Date("2026-08-02T13:00:00Z").getTime()},
-  {id:"bel",name:"Belgian GP",date:"Aug 30",ts:new Date("2026-08-30T13:00:00Z").getTime()},
-  {id:"ned",name:"Dutch GP",date:"Sep 6",ts:new Date("2026-09-06T13:00:00Z").getTime()},
-  {id:"ita",name:"Italian GP",date:"Sep 13",ts:new Date("2026-09-13T13:00:00Z").getTime()},
-  {id:"aze",name:"Azerbaijan GP",date:"Sep 27",ts:new Date("2026-09-27T11:00:00Z").getTime()},
-  {id:"sgp",name:"Singapore GP",date:"Oct 4",ts:new Date("2026-10-04T12:00:00Z").getTime()},
-  {id:"usa",name:"United States GP",date:"Oct 18",ts:new Date("2026-10-18T19:00:00Z").getTime()},
-  {id:"mex",name:"Mexico City GP",date:"Oct 25",ts:new Date("2026-10-25T20:00:00Z").getTime()},
-  {id:"bra",name:"São Paulo GP",date:"Nov 8",ts:new Date("2026-11-08T17:00:00Z").getTime()},
-  {id:"lv",name:"Las Vegas GP",date:"Nov 21",ts:new Date("2026-11-21T06:00:00Z").getTime()},
-  {id:"qat",name:"Qatar GP",date:"Nov 29",ts:new Date("2026-11-29T13:00:00Z").getTime()},
-  {id:"abu",name:"Abu Dhabi GP",date:"Dec 6",ts:new Date("2026-12-06T13:00:00Z").getTime()},
+  {id:"aus",name:"Australian GP",track:"Albert Park Circuit",date:"Mar 8",ts:new Date("2026-03-08T05:00:00Z").getTime()},
+  {id:"chn_s",name:"Chinese GP Sprint",track:"Shanghai International Circuit",date:"Mar 14",ts:new Date("2026-03-14T07:00:00Z").getTime(),isSprint:true},
+  {id:"chn",name:"Chinese GP",track:"Shanghai International Circuit",date:"Mar 15",ts:new Date("2026-03-15T07:00:00Z").getTime()},
+  {id:"jpn",name:"Japanese GP",track:"Suzuka Circuit",date:"Mar 29",ts:new Date("2026-03-29T05:00:00Z").getTime()},
+  {id:"bhr",name:"Bahrain GP",track:"Bahrain International Circuit",date:"Apr 12",ts:new Date("2026-04-12T15:00:00Z").getTime()},
+  {id:"ksa",name:"Saudi Arabian GP",track:"Jeddah Corniche Circuit",date:"Apr 19",ts:new Date("2026-04-19T17:00:00Z").getTime()},
+  {id:"mia_s",name:"Miami GP Sprint",track:"Miami International Autodrome",date:"May 2",ts:new Date("2026-05-02T19:00:00Z").getTime(),isSprint:true},
+  {id:"mia",name:"Miami GP",track:"Miami International Autodrome",date:"May 3",ts:new Date("2026-05-03T19:00:00Z").getTime()},
+  {id:"can_s",name:"Canadian GP Sprint",track:"Circuit Gilles Villeneuve",date:"May 23",ts:new Date("2026-05-23T18:00:00Z").getTime(),isSprint:true},
+  {id:"can",name:"Canadian GP",track:"Circuit Gilles Villeneuve",date:"May 24",ts:new Date("2026-05-24T18:00:00Z").getTime()},
+  {id:"mon",name:"Monaco GP",track:"Circuit de Monaco",date:"Jun 7",ts:new Date("2026-06-07T13:00:00Z").getTime()},
+  {id:"esp",name:"Barcelona-Catalunya GP",track:"Circuit de Barcelona-Catalunya",date:"Jun 14",ts:new Date("2026-06-14T13:00:00Z").getTime()},
+  {id:"aut",name:"Austrian GP",track:"Red Bull Ring",date:"Jun 28",ts:new Date("2026-06-28T13:00:00Z").getTime()},
+  {id:"gbr_s",name:"British GP Sprint",track:"Silverstone Circuit",date:"Jul 4",ts:new Date("2026-07-04T14:00:00Z").getTime(),isSprint:true},
+  {id:"gbr",name:"British GP",track:"Silverstone Circuit",date:"Jul 5",ts:new Date("2026-07-05T14:00:00Z").getTime()},
+  {id:"bel",name:"Belgian GP",track:"Circuit de Spa-Francorchamps",date:"Jul 19",ts:new Date("2026-07-19T13:00:00Z").getTime()},
+  {id:"hun",name:"Hungarian GP",track:"Hungaroring",date:"Jul 26",ts:new Date("2026-07-26T13:00:00Z").getTime()},
+  {id:"ned_s",name:"Dutch GP Sprint",track:"Circuit Zandvoort",date:"Aug 22",ts:new Date("2026-08-22T13:00:00Z").getTime(),isSprint:true},
+  {id:"ned",name:"Dutch GP",track:"Circuit Zandvoort",date:"Aug 23",ts:new Date("2026-08-23T13:00:00Z").getTime()},
+  {id:"ita",name:"Italian GP",track:"Autodromo Nazionale Monza",date:"Sep 6",ts:new Date("2026-09-06T13:00:00Z").getTime()},
+  {id:"mad",name:"Madrid GP",track:"Madring Street Circuit",date:"Sep 13",ts:new Date("2026-09-13T13:00:00Z").getTime()},
+  {id:"aze",name:"Azerbaijan GP",track:"Baku City Circuit",date:"Sep 26",ts:new Date("2026-09-26T11:00:00Z").getTime()},
+  {id:"sgp_s",name:"Singapore GP Sprint",track:"Marina Bay Street Circuit",date:"Oct 10",ts:new Date("2026-10-10T12:00:00Z").getTime(),isSprint:true},
+  {id:"sgp",name:"Singapore GP",track:"Marina Bay Street Circuit",date:"Oct 11",ts:new Date("2026-10-11T12:00:00Z").getTime()},
+  {id:"usa",name:"United States GP",track:"Circuit of The Americas",date:"Oct 25",ts:new Date("2026-10-25T19:00:00Z").getTime()},
+  {id:"mex",name:"Mexico City GP",track:"Autodromo Hermanos Rodriguez",date:"Nov 1",ts:new Date("2026-11-01T20:00:00Z").getTime()},
+  {id:"bra",name:"São Paulo GP",track:"Autodromo Jose Carlos Pace",date:"Nov 8",ts:new Date("2026-11-08T17:00:00Z").getTime()},
+  {id:"lv",name:"Las Vegas GP",track:"Las Vegas Street Circuit",date:"Nov 21",ts:new Date("2026-11-21T06:00:00Z").getTime()},
+  {id:"qat",name:"Qatar GP",track:"Lusail International Circuit",date:"Nov 29",ts:new Date("2026-11-29T13:00:00Z").getTime()},
+  {id:"abu",name:"Abu Dhabi GP",track:"Yas Marina Circuit",date:"Dec 6",ts:new Date("2026-12-06T13:00:00Z").getTime()},
 ];
 
 const CATS=[
@@ -208,7 +214,8 @@ const CATS=[
   {id:"top_5",         label:"Top 5 Finish",           pts:5, emoji:"🔝",raceOnly:true, multi:5, ptsPerPick:5,opts:"drivers",     group:"standard"},
   {id:"top_10",        label:"Top 10 Finish",          pts:2, emoji:"🔢",raceOnly:true, multi:10,ptsPerPick:2,opts:"drivers",     group:"standard"},
   {id:"pole",          label:"Pole Position",          pts:2, emoji:"🚀",raceOnly:true, multi:0, ptsPerPick:0,opts:"drivers",     group:"standard"},
-  {id:"fastest_lap",   label:"Fastest Lap",            pts:1, emoji:"⚡",raceOnly:true, multi:0, ptsPerPick:0,opts:"drivers",     group:"standard"},
+  {id:"sprint_pole",   label:"Sprint Qualifying Pole", pts:2, emoji:"⚡",raceOnly:true, multi:0, ptsPerPick:0,opts:"drivers",     group:"standard",sprintOnly:true},
+  {id:"fastest_lap",   label:"Fastest Lap",            pts:1, emoji:"⏱",raceOnly:true, multi:0, ptsPerPick:0,opts:"drivers",     group:"standard"},
   {id:"dotd",          label:"Driver of the Day",      pts:1, emoji:"⭐",raceOnly:true, multi:0, ptsPerPick:0,opts:"drivers",     group:"standard"},
   {id:"dnf",           label:"DNF Prediction",         pts:2, emoji:"🔧",raceOnly:true, multi:0, ptsPerPick:0,opts:"drivers",     group:"standard"},
   {id:"hat_trick",     label:"Hat Trick (Win+Pole+FL)",pts:15,emoji:"🎩",raceOnly:true, multi:0, ptsPerPick:0,opts:"drivers",     group:"risky"},
@@ -223,13 +230,13 @@ const CATS=[
   {id:"exact_pos",     label:"Exact Finish Position",   pts:10,emoji:"🎯",raceOnly:true, multi:0, ptsPerPick:0,opts:"custom",      group:"risky"},
   {id:"championship",  label:"Drivers' Championship",  pts:10,emoji:"👑",raceOnly:false,multi:0, ptsPerPick:0,opts:"drivers",     group:"season"},
   {id:"constructors",  label:"Constructors' Champ.",    pts:5, emoji:"🏗️",raceOnly:false,multi:0, ptsPerPick:0,opts:"constructors",group:"season"},
-  {id:"custom",        label:"Custom Bet",              pts:1, emoji:"🎲",raceOnly:false,multi:0, ptsPerPick:0,opts:"custom",      group:"season"},
+  {id:"custom",        label:"Custom Bet",              pts:1, emoji:"🎲",raceOnly:false,raceOptional:true,multi:0,ptsPerPick:0,opts:"custom",group:"season"},
 ];
 const RISKY=new Set(CATS.filter(c=>c.group==="risky").map(c=>c.id));
 const DRIVERS=["Max Verstappen","Isack Hadjar","Lewis Hamilton","Charles Leclerc","George Russell","Kimi Antonelli","Lando Norris","Oscar Piastri","Fernando Alonso","Lance Stroll","Esteban Ocon","Oliver Bearman","Pierre Gasly","Franco Colapinto","Nico Hülkenberg","Gabriel Bortoleto","Carlos Sainz","Alex Albon","Liam Lawson","Arvid Lindblad","Sergio Perez","Valtteri Bottas","Other / TBD"];
 const CONSTRUCTORS=["Red Bull","Ferrari","Mercedes","McLaren","Aston Martin","Alpine","Haas","Sauber / Audi","Williams","Racing Bulls","Cadillac"];
 const YESNO=["Yes","No"];
-const DEF_PTS={race_winner:3,podium:7,top_5:5,top_10:2,pole:2,fastest_lap:1,dotd:1,dnf:2,hat_trick:15,last_place:6,first_retire:5,safety_car:3,red_flag:6,teammate_duel:4,comeback:5,most_overtakes:6,fastest_pit:4,exact_pos:10,championship:10,constructors:5,custom:1};
+const DEF_PTS={race_winner:3,podium:7,top_5:5,top_10:2,pole:2,sprint_pole:2,fastest_lap:1,dotd:1,dnf:2,hat_trick:15,last_place:6,first_retire:5,safety_car:3,red_flag:6,teammate_duel:4,comeback:5,most_overtakes:6,fastest_pit:4,exact_pos:10,championship:10,constructors:5,custom:1};
 
 // Firebase
 let fbdb=null,syncRoom=null,syncUnsub=null,syncStatus="off";
@@ -296,11 +303,12 @@ const emptyPick=id=>isMulti(id)?[]:"";
 
 // Results
 const isMR=r=>r&&typeof r==="object"&&r.type==="multi";
+const isSR=r=>r&&typeof r==="object"&&!r.type; // new single result {p1:bool,p2:bool}
 const isSettled=b=>b.result!=null;
-const p1pts=b=>{if(!b.result||b.result==="push")return 0;if(isMR(b.result))return b.result.p1Score;return b.result==="p1"?b.points:0;};
-const p2pts=b=>{if(!b.result||b.result==="push")return 0;if(isMR(b.result))return b.result.p2Score;return b.result==="p2"?b.points:0;};
+const p1pts=b=>{if(!b.result||b.result==="push")return 0;if(isMR(b.result))return b.result.p1Score;if(isSR(b.result))return b.result.p1?b.points:0;return b.result==="p1"?b.points:0;};
+const p2pts=b=>{if(!b.result||b.result==="push")return 0;if(isMR(b.result))return b.result.p2Score;if(isSR(b.result))return b.result.p2?b.points:0;return b.result==="p2"?b.points:0;};
 const mWin=r=>isMR(r)?(r.p1Score>r.p2Score?"p1":r.p2Score>r.p1Score?"p2":"tie"):null;
-const winSide=b=>!isSettled(b)||b.result==="push"?null:(isMR(b.result)?mWin(b.result):b.result);
+const winSide=b=>{if(!isSettled(b)||b.result==="push")return null;if(isMR(b.result))return mWin(b.result);if(isSR(b.result)){if(b.result.p1&&b.result.p2)return"both";if(b.result.p1)return"p1";if(b.result.p2)return"p2";return"push";}return b.result;};
 const calcMS=(b,actual)=>{
   const ppp=cat(b.catId).ptsPerPick||b.ptsPerPick||0;
   const p1a=arr(b.p1Pick),p2a=arr(b.p2Pick);
@@ -467,12 +475,12 @@ function render(){
     else if(S.view==="settled")db=bets.filter(b=>isSettled(b));
     else if(S.view==="race")db=S.raceFilter!=="all"?bets.filter(b=>b.race&&b.race.id===S.raceFilter):bets.filter(b=>b.race);
     else if(S.view==="season")db=bets.filter(b=>!b.race);
-    const rf=S.view==="race"?`<div class="race-filter"><select onchange="setRF(this.value)"><option value="all">All Races</option>${RACES.map(r=>`<option value="${r.id}"${S.raceFilter===r.id?" selected":""}>${r.date} — ${r.name}</option>`).join("")}</select></div>`:"";
+    const rf=S.view==="race"?`<div class="race-filter"><select onchange="setRF(this.value)"><option value="all">All Races</option>${RACES.map(r=>`<option value="${r.id}"${S.raceFilter===r.id?" selected":""}>${r.date} — ${r.name}${r.track?` · ${r.track}`:""}</option>`).join("")}</select></div>`:"";
     const cards=db.length===0?`<div class="empty"><div style="font-size:36px;margin-bottom:10px">🏎️</div><div style="font-size:16px">No bets here yet.</div><div style="font-size:13px;margin-top:4px">Hit + to add one!</div></div>`
       :db.map(b=>{
-        const c=cat(b.catId),push=b.result==="push",mr=isMR(b.result),ws=winSide(b);
-        const bc=isSettled(b)?(push?"#333":ws==="p1"?"#E8002D33":ws==="p2"?"#0090FF33":"#333"):"#222";
-        const ptsH=push?`<div class="bet-pts" style="color:#555">—</div>`:mr?`<div class="multi-pts-col"><div class="mpt" style="color:#E8002D">+${p1pts(b)}pts</div><div class="mpt" style="color:#0090FF">+${p2pts(b)}pts</div></div>`:isSettled(b)?`<div class="bet-pts" style="color:${ws==="p1"?"#E8002D":"#0090FF"}">+${b.points}pts</div>`:`<div class="bet-pts" style="color:#fff">${b.points}pts</div>`;
+        const c=cat(b.catId),push=b.result==="push"||winSide(b)==="push",mr=isMR(b.result),ws=winSide(b);
+        const bc=isSettled(b)?(push?"#333":ws==="both"?"#f5c51855":ws==="p1"?"#E8002D33":ws==="p2"?"#0090FF33":"#333"):"#222";
+        const ptsH=push?`<div class="bet-pts" style="color:#555">—</div>`:mr?`<div class="multi-pts-col"><div class="mpt" style="color:#E8002D">+${p1pts(b)}pts</div><div class="mpt" style="color:#0090FF">+${p2pts(b)}pts</div></div>`:ws==="both"?`<div class="multi-pts-col"><div class="mpt" style="color:#E8002D">+${b.points}pts</div><div class="mpt" style="color:#0090FF">+${b.points}pts</div></div>`:isSettled(b)?`<div class="bet-pts" style="color:${ws==="p1"?"#E8002D":"#0090FF"}">+${b.points}pts</div>`:`<div class="bet-pts" style="color:#fff">${b.points}pts</div>`;
         return`<div class="bet-card" style="border:1px solid ${bc};opacity:${push?.5:1}">
           <div class="bet-card-inner">
             <div style="flex:1;min-width:0">
@@ -583,14 +591,15 @@ function renderModals(){
     div.innerHTML=`<div class="modal"><div class="modal-hdr"><span class="modal-title">NEW BET</span><button class="close-btn" onclick="closeAdd()">✕</button></div>
       <label class="field-lbl">Category</label>${catSelect(s.catId,"updateCat(this.value)")}
       ${c.raceOnly?`<label class="field-lbl">Race</label><select class="field-input" onchange="upd('raceId',this.value)">${RACES.map(r=>`<option value="${r.id}"${s.raceId===r.id?" selected":""}>${r.date} — ${r.name}</option>`).join("")}</select>`:""}
-      ${s.catId==="custom"?`<label class="field-lbl">Description</label><input class="field-input" value="${esc(s.customDesc)}" placeholder="e.g. Norris hat-trick…" oninput="upd('customDesc',this.value)"/>`:""}
+      ${c.raceOptional?`<label class="field-lbl">Race <span style="color:#444">(optional)</span></label><select class="field-input" onchange="upd('raceId',this.value)"><option value="">— No specific race —</option>${RACES.map(r=>`<option value="${r.id}"${s.raceId===r.id?" selected":""}>${r.date} — ${r.name}</option>`).join("")}</select>`:""}
+      ${s.catId==="custom"?`<label class="field-lbl">Description</label><input class="field-input" value="${esc(s.customDesc)}" placeholder="e.g. Norris hat-trick…" oninput="updText('customDesc',this.value)"/>`:""}
       ${multi?`<div style="background:#0a180a;border:1px solid #1e3a1e;border-radius:6px;padding:8px 12px;font-size:12px;color:#4a8a4a;margin-top:12px">🎯 <strong>${c.ptsPerPick} pts per correct pick</strong> — scored individually after the race.</div>`:""}
       ${pickSection(s,S.players,"toggleMP","upd")}
       <p style="font-size:11px;color:#444;margin-top:8px">At least one pick required.</p>
       <label class="field-lbl">${multi?"Pts per Correct Pick":"Points at Stake"}</label>
       <input class="pts-input" type="number" min="1" max="99" value="${s.pts}" oninput="upd('pts',+this.value)"/>
       <label class="field-lbl">Note <span style="color:#444">(optional)</span></label>
-      <input class="field-input" value="${esc(s.note||"")}" placeholder="Any extra context…" oninput="upd('note',this.value)"/>
+      <input class="field-input" value="${esc(s.note||"")}" placeholder="Any extra context…" oninput="updText('note',this.value)"/>
       <button class="lock-btn" style="background:${ready?"#E8002D":"#1a1a1a"};color:${ready?"#fff":"#555"}" onclick="submitBet()">Lock In Bet</button>
     </div>`;document.body.appendChild(div);
   }
@@ -638,14 +647,26 @@ function renderModals(){
           <button class="void-btn" onclick="settleSingle('push')">Push / Void</button>
         </div>`;
       } else {
-        const p1d=esc(b.p1Pick)||'<em style="opacity:.4;font-size:12px">No pick</em>';
-        const p2d=esc(b.p2Pick)||'<em style="opacity:.4;font-size:12px">No pick</em>';
+        const p1d=hasPick(b.p1Pick)?esc(pickTxt(b.p1Pick)):'<em style="opacity:.4;font-size:12px">No pick</em>';
+        const p2d=hasPick(b.p2Pick)?esc(pickTxt(b.p2Pick)):'<em style="opacity:.4;font-size:12px">No pick</em>';
+        const t=S.settleToggles||{p1:false,p2:false};
         div.innerHTML=`<div class="modal" style="max-width:400px"><div class="modal-hdr"><span class="modal-title">SETTLE BET</span><button class="close-btn" onclick="closeSettle()">✕</button></div>
           <p style="color:#888;font-size:14px;margin-bottom:20px">${c.emoji} ${esc(b.description)}</p>
+          <p style="color:#555;font-size:12px;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">Who got it right?</p>
           <div class="settle-grid">
-            <button class="settle-opt red" onclick="settleSingle('p1')"><div style="font-size:11px;opacity:.7;margin-bottom:6px">${esc(S.players.p1)} WINS</div>${p1d}<div style="margin-top:8px;font-size:12px">+${b.points}pts</div></button>
-            <button class="settle-opt blue" onclick="settleSingle('p2')"><div style="font-size:11px;opacity:.7;margin-bottom:6px">${esc(S.players.p2)} WINS</div>${p2d}<div style="margin-top:8px;font-size:12px">+${b.points}pts</div></button>
+            <button class="settle-opt ${t.p1?"red":"dim"}" onclick="toggleSettle('p1')" style="border-color:${t.p1?"#E8002D":"#333"};background:${t.p1?"#E8002D22":"transparent"}">
+              <div style="font-size:11px;opacity:.7;margin-bottom:6px">${esc(S.players.p1)}</div>
+              ${p1d}
+              <div style="margin-top:8px;font-size:13px">${t.p1?"✓ Correct":"Correct?"}</div>
+            </button>
+            <button class="settle-opt ${t.p2?"blue":"dim"}" onclick="toggleSettle('p2')" style="border-color:${t.p2?"#0090FF":"#333"};background:${t.p2?"#0090FF22":"transparent"}">
+              <div style="font-size:11px;opacity:.7;margin-bottom:6px">${esc(S.players.p2)}</div>
+              ${p2d}
+              <div style="margin-top:8px;font-size:13px">${t.p2?"✓ Correct":"Correct?"}</div>
+            </button>
           </div>
+          ${(t.p1||t.p2)?`<div style="background:#0d0d0d;border:1px solid #1e1e1e;border-radius:8px;padding:10px 14px;margin-top:10px;font-size:13px;color:#888;text-align:center">${t.p1&&t.p2?"Both correct — each gets +"+b.points+"pts":t.p1?esc(S.players.p1)+" gets +"+b.points+"pts":esc(S.players.p2)+" gets +"+b.points+"pts"}</div>`:""}
+          <button onclick="confirmSettle()" style="margin-top:14px;width:100%;background:#E8002D;border:none;border-radius:8px;color:#fff;padding:12px 0;font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:inherit">Confirm</button>
           <button class="void-btn" onclick="settleSingle('push')">Push / Void</button>
         </div>`;
       }
@@ -663,12 +684,14 @@ function renderModals(){
         ${sett?`<div style="background:#1a1200;border:1px solid #3a2e00;border-radius:6px;padding:8px 12px;font-size:12px;color:#998800;margin-bottom:14px">⚠ Settled — category &amp; race locked</div>`:""}
         <label class="field-lbl">Category</label>${sett?`<div class="field-input" style="opacity:.4">${c.emoji} ${c.label}</div>`:catSelect(ef.catId,"updateEditCat(this.value)")}
         ${c.raceOnly?`<label class="field-lbl">Race</label><select class="field-input" ${sett?"disabled style='opacity:.4'":""} onchange="updE('raceId',this.value)">${RACES.map(r=>`<option value="${r.id}"${ef.raceId===r.id?" selected":""}>${r.date} — ${r.name}</option>`).join("")}</select>`:""}
-        ${ef.catId==="custom"?`<label class="field-lbl">Description</label><input class="field-input" value="${esc(ef.customDesc)}" oninput="updE('customDesc',this.value)"/>`:""}
+        ${c.raceOptional?`<label class="field-lbl">Race <span style="color:#444">(optional)</span></label><select class="field-input" onchange="updE('raceId',this.value)"><option value="">— No specific race —</option>${RACES.map(r=>`<option value="${r.id}"${ef.raceId===r.id?" selected":""}>${r.date} — ${r.name}</option>`).join("")}</select>`:""}
+        ${ef.catId==="custom"?`<label class="field-lbl">Description</label><input class="field-input" value="${esc(ef.customDesc)}" oninput="updEText('customDesc',this.value)"/>`:""}
+
         ${pickSection(ef,S.players,"toggleMPE","updE")}
         <label class="field-lbl">${multi?"Pts per Correct Pick":"Points at Stake"}</label>
         <input class="pts-input" type="number" min="1" max="99" value="${ef.pts}" oninput="updE('pts',+this.value)"/>
         <label class="field-lbl">Note <span style="color:#444">(optional)</span></label>
-        <input class="field-input" value="${esc(ef.note||"")}" oninput="updE('note',this.value)"/>
+        <input class="field-input" value="${esc(ef.note||"")}" oninput="updEText('note',this.value)"/>
         <button class="lock-btn" style="background:#E8002D;color:#fff" onclick="saveEdit()">Save Changes</button>
       </div>`;document.body.appendChild(div);
     }
@@ -719,6 +742,8 @@ function setView(v){S.view=v;render();}
 function setRF(v){S.raceFilter=v;render();}
 function editName(k){S.editingP=k;S._nameInput=S.players[k];render();}
 function saveName(){if(S._nameInput.trim())S.players[S.editingP]=S._nameInput.trim();S.editingP=null;save();render();}
+function updText(k,v){if(S.addForm)S.addForm[k]=v;}  // no re-render — fixes keyboard dismiss
+function updEText(k,v){if(S.editForm)S.editForm[k]=v;} // no re-render
 
 function openSync(){S.syncOpen=true;renderModals();}
 function closeSync(){S.syncOpen=false;renderModals();}
@@ -728,8 +753,10 @@ function closeJoin(){S.joinOpen=false;renderModals();}
 function doJoin(){const i=document.getElementById("jci"),code=(i?i.value:"").trim().toUpperCase();if(code.length>=4){startSync(code);S.joinOpen=false;S.syncOpen=true;renderModals();}}
 function copyCode(){if(!syncRoom)return;navigator.clipboard.writeText(syncRoom).then(()=>{const b=document.getElementById("cpyBtn");if(b){b.textContent="✓ Copied!";b.style.color="#4caf50";setTimeout(()=>{b.textContent="Copy Room Code";b.style.color="#ccc";},2000);}}).catch(()=>{});}
 
-function openSettle(id){S.settlingId=id;S.settlingActual=[];renderModals();}
-function closeSettle(){S.settlingId=null;S.settlingActual=[];renderModals();}
+function openSettle(id){S.settlingId=id;S.settlingActual=[];S.settleToggles={p1:false,p2:false};renderModals();}
+function closeSettle(){S.settlingId=null;S.settlingActual=[];S.settleToggles=null;renderModals();}
+function toggleSettle(side){if(!S.settleToggles)S.settleToggles={p1:false,p2:false};S.settleToggles[side]=!S.settleToggles[side];renderModals();}
+function confirmSettle(){const t=S.settleToggles||{p1:false,p2:false};if(!t.p1&&!t.p2){settleSingle('push');return;}S.bets=S.bets.map(b=>b.id===S.settlingId?{...b,result:{p1:!!t.p1,p2:!!t.p2}}:b);S.settlingId=null;S.settlingActual=[];S.settleToggles=null;save();render();}
 function tActual(driver){
   const b=S.bets.find(x=>x.id===S.settlingId),max=cat(b.catId).multi,a=S.settlingActual;
   S.settlingActual=a.includes(driver)?a.filter(d=>d!==driver):a.length<max?[...a,driver]:a;renderModals();
@@ -754,7 +781,7 @@ function submitBet(){
   const p1v=multi?arr(s.p1Pick):s.p1Pick,p2v=multi?arr(s.p2Pick):s.p2Pick;
   if(multi?(p1v.length===0&&p2v.length===0):(!p1v&&!p2v))return;
   if(s.catId==="custom"&&!s.customDesc.trim())return;
-  const r=c.raceOnly?race(s.raceId):null;
+  const r=(c.raceOnly||(c.raceOptional&&s.raceId))?race(s.raceId):null;
   const desc=s.catId==="custom"?s.customDesc:`${c.label}${r?` · ${r.name}`:""}`;
   S.bets.unshift({id:uid(),catId:s.catId,race:r||null,p1Pick:multi?p1v:(p1v||""),p2Pick:multi?p2v:(p2v||""),description:desc,points:s.pts,ptsPerPick:c.ptsPerPick,result:null,note:s.note||"",ts:Date.now()});
   S.addOpen=false;save();render();
@@ -782,7 +809,8 @@ function updateEditCat(catId){if(!S.editForm)return;S.editForm={...S.editForm,ca
 function toggleMPE(fk,catId,driver){if(!S.editForm)return;const max=cat(catId).multi;let a=arr(S.editForm[fk]);a=a.includes(driver)?a.filter(d=>d!==driver):a.length<max?[...a,driver]:a;S.editForm[fk]=a;renderModals();}
 function saveEdit(){
   const ef=S.editForm,id=S.editId,b=S.bets.find(x=>x.id===id);if(!ef||!b)return;
-  const c=cat(ef.catId),multi=isMulti(ef.catId),r=c.raceOnly?race(ef.raceId):null;
+  const c=cat(ef.catId),multi=isMulti(ef.catId);
+  const r=(c.raceOnly||(c.raceOptional&&ef.raceId))?race(ef.raceId):null;
   const desc=ef.catId==="custom"?ef.customDesc:`${c.label}${r?` · ${r.name}`:""}`;
   S.bets=S.bets.map(x=>x.id===id?{...x,catId:ef.catId,race:r||null,p1Pick:multi?arr(ef.p1Pick):(ef.p1Pick||""),p2Pick:multi?arr(ef.p2Pick):(ef.p2Pick||""),description:desc,points:ef.pts,ptsPerPick:c.ptsPerPick,note:ef.note||""}:x);
   S.editId=null;S.editForm=null;save();render();
